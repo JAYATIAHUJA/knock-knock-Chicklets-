@@ -129,7 +129,7 @@ export default function App(){
    {room&&<div className="room-code">ROOM <b>{room.code}</b><button onClick={async()=>{await navigator.clipboard.writeText(url);setCopied(true);setTimeout(()=>setCopied(false),1800)}}>{copied?'COPIED!':'COPY LINK'}</button></div>}
   </header>
 
-  {!room?<Landing joining={!!code}>
+  {!room?<Landing>
    <div className="join-card">
     <label>Dost kya bulate hain?<input maxLength={20} value={name} onChange={e=>setName(e.target.value)} placeholder="Jaise: Chintu, Gudiya, Bunty"/></label>
     <div className="color-label">Pick your colour</div>

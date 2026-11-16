@@ -1,445 +1,484 @@
-.app:not(.in-game)>header{display:none}
+/* Hide default App header on landing */
+.app:not(.in-game) > header { display: none; }
 
-.knock-landing{
-  --ink:#1a2e26;
-  --sheet:#f3ca40;
-  --terracotta:#b83a24;
-  --hand-left:-135%;
-  --hand-right:45%;
-  --hand-drop:25%;
-  --hand-angle:-28deg;
-  position:relative;
-  isolation:isolate;
-  background:var(--sheet);
-  color:var(--ink);
-  height:100svh;
-  max-height:100svh;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  font-family:'DM Sans',sans-serif;
+.landing-root {
+  position: relative;
+  width: 100vw;
+  height: 100svh;
+  max-height: 100svh;
+  overflow: hidden;
+  background: #fbf5e5;
+  color: #1a2f26;
+  font-family: 'DM Sans', sans-serif;
 }
 
-/* Background grain & street feel */
-.knock-landing::before{
-  content:'';
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  z-index:1;
-  opacity:.075;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23000' filter='url(%23n)' opacity='.65' d='M0 0h180v180H0z'/%3E%3C/svg%3E");
+/* ══════════════════════════════════════════════
+   1. INTRO / PRELOADER CURTAIN
+   ══════════════════════════════════════════════ */
+.intro-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: #14211a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: opacity 0.7s ease, transform 0.7s ease, visibility 0.7s;
 }
 
-/* ── Desi Nav Bar ────────────────────────────── */
-.landing-nav{
-  position:relative;
-  z-index:10;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:12px 3vw;
-  flex-shrink:0;
+.intro-curtain.curtain-dissolve {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1.04);
 }
 
-.desi-badge{
-  background:#233d32;
-  color:#fff2d0;
-  padding:6px 14px;
-  border-radius:20px;
-  border:1.5px dashed #f6d88c;
-  box-shadow:3px 3px 0 #12211b;
-  transform:rotate(-2deg);
+.curtain-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.85) 90%);
+  pointer-events: none;
 }
 
-.landing-signature{
-  font:700 15px 'Yatra One', 'Baloo 2', cursive;
-  letter-spacing:0.04em;
+.curtain-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
 }
 
-.landing-text-button{
-  border:1.5px solid #233d32;
-  background:#fff7e0;
-  color:#233d32;
-  font:700 12px 'DM Sans',sans-serif;
-  padding:6px 14px;
-  border-radius:20px;
-  cursor:pointer;
-  box-shadow:2px 2px 0 #233d32;
-  transition:transform 0.1s ease;
+/* Knock text effects */
+.knock-fx {
+  position: absolute;
+  top: -80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.landing-text-button:hover{
-  transform:translate(-1px,-1px);
-  box-shadow:3px 3px 0 #233d32;
+.knock-word {
+  font-family: 'Yatra One', 'Baloo 2', cursive;
+  font-size: clamp(52px, 8vw, 90px);
+  color: #f7ce46;
+  text-shadow: 0 0 25px rgba(247, 206, 70, 0.6), 4px 4px 0 #8b2c14;
+  animation: knock-word-pop 0.35s ease-out;
 }
 
-/* ── Single Viewport Stage Layout ───────────── */
-.landing-viewport-stage{
-  position:relative;
-  z-index:5;
-  flex:1;
-  display:grid;
-  grid-template-columns:1.15fr 0.85fr;
-  align-items:center;
-  padding:0 3vw;
-  gap:2vw;
-  height:calc(100svh - 90px);
-  max-height:calc(100svh - 90px);
+@keyframes knock-word-pop {
+  0% { transform: scale(0.6) rotate(-8deg); opacity: 0; }
+  60% { transform: scale(1.15) rotate(4deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); }
 }
 
-/* ── Knock Theatre (Left side) ──────────────── */
-.knock-theatre{
-  position:relative;
-  width:100%;
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+/* Shockwave rings on impact */
+.knock-wave-ring {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border: 3px solid #f7ce46;
+  border-radius: 50%;
+  animation: ring-pulse 0.7s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
 }
 
-.landing-wordmark{
-  position:relative;
-  text-align:center;
-  z-index:2;
-  opacity:0;
+.knock-wave-ring.delayed {
+  animation-delay: 0.15s;
 }
 
-.wordmark-prelude{
-  font:700 clamp(18px,2vw,26px) 'Yatra One', 'Baloo 2', cursive;
-  color:#732313;
-  margin:0 0 6px;
-  transform:rotate(-3deg);
-  text-shadow:1px 1px 0 #ffd782;
+@keyframes ring-pulse {
+  0% { transform: scale(0.3); opacity: 0.9; }
+  100% { transform: scale(2.8); opacity: 0; }
 }
 
-.landing-wordmark h1{
-  position:relative;
-  display:inline-flex;
-  margin:0;
-  font:900 clamp(56px,8.5vw,130px)/.9 'Yatra One', 'Baloo 2', cursive;
-  letter-spacing:-.02em;
-  color:#1c332b;
-  text-shadow:4px 4px 0 #b33924, 6px 6px 0 #4a140b;
-  transform:rotate(-2deg);
+/* Authentic physical knocking hand in intro */
+.intro-hand {
+  width: clamp(220px, 32vw, 360px);
+  height: clamp(260px, 38vw, 420px);
+  margin-top: 20px;
+  filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6));
+  animation: hand-strike 0.65s cubic-bezier(0.2, 0.9, 0.3, 1) infinite alternate;
 }
 
-.landing-wordmark h1>span{display:inline-block;transform-origin:50% 90%}
-.landing-wordmark h1>span:nth-child(3n+2){transform:rotate(3deg) translateY(-.02em)}
-.landing-wordmark h1>span:nth-child(3n){transform:rotate(-3deg) translateY(.02em)}
-
-.wordmark-dot{
-  position:absolute;
-  right:-.24em;
-  top:-.08em;
-  font-size:.28em;
-  color:#b83a24;
+.intro-hand img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
-.wordmark-caption{
-  font:700 clamp(12px,1.2vw,16px) 'DM Sans',sans-serif;
-  margin:18px 0 0;
-  color:#3a4e44;
-  letter-spacing:.04em;
-  background:#fff5db;
-  display:inline-block;
-  padding:6px 14px;
-  border-radius:4px;
-  border:1px dashed #7a5824;
-  transform:rotate(1deg);
+@keyframes hand-strike {
+  0% { transform: translateY(20px) rotate(-8deg) scale(0.96); }
+  50% { transform: translateY(-15px) rotate(2deg) scale(1.04); }
+  100% { transform: translateY(0) rotate(-2deg) scale(1); }
 }
 
-/* The iconic animated knocking hands */
-.knocking-arm{
-  position:absolute;
-  width:clamp(200px,26vw,380px);
-  height:540px;
-  left:50%;
-  top:5%;
-  transform-origin:50% 85%;
-  pointer-events:none;
-  z-index:3;
-  opacity:0;
+.intro-tagline {
+  margin-top: 25px;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #e5d8be;
+  letter-spacing: 0.05em;
 }
 
-.knocking-arm img{
-  display:block;
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  object-position:top;
-  filter:drop-shadow(8px 14px 10px rgba(50,38,16,0.3));
-  user-select:none;
+.skip-intro-btn {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff4d6;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s;
 }
 
-.arm-left{transform:translate(-50%,100%) rotate(-12deg)}
-.arm-right{transform:translate(-50%,100%) scaleX(-1) rotate(-12deg)}
-
-.knock-copy{
-  position:absolute;
-  top:20%;
-  left:50%;
-  transform:translateX(-50%);
-  z-index:4;
-  font:900 clamp(50px,7.5vw,95px)/.9 'Yatra One', 'Baloo 2', cursive;
-  color:#992415;
-  text-shadow:3px 3px 0 #fbe6a2, 5px 5px 0 #3a0d06;
-  pointer-events:none;
-  white-space:nowrap;
+.skip-intro-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
-.knock-copy span{display:block;opacity:0}
-.knock-copy span:first-child{transform:translate(-110%,-20%) rotate(-12deg)}
-.knock-copy span:last-child{transform:translate(105%,40%) rotate(9deg)}
-
-.knock-impact{
-  position:absolute;
-  z-index:4;
-  top:18%;
-  left:50%;
-  width:145px;
-  height:120px;
-  opacity:0;
-  pointer-events:none;
+/* ══════════════════════════════════════════════
+   2. REAL MOHALLA WEBSITE (Completely Hand-Free!)
+   ══════════════════════════════════════════════ */
+.real-mohalla-site {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  max-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #fbf5e5 url('/textures/plastered_wall_02_Diffuse.jpg') center/cover;
+  background-blend-mode: soft-light;
 }
 
-.knock-impact i{
-  position:absolute;
-  display:block;
-  background:#992415;
-  width:6px;
-  height:36px;
-  border-radius:50%;
-  top:0;
-  left:65px;
-  transform:rotate(-5deg);
+/* Top Street Navigation */
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 3vw;
+  background: #1c3228;
+  color: #fff5db;
+  border-bottom: 3px solid #d99c3b;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  flex-shrink: 0;
 }
 
-.knock-impact i:first-child{left:10px;top:22px;transform:rotate(-48deg)}
-.knock-impact i:last-child{left:122px;top:17px;transform:rotate(43deg)}
-
-.impact-one{transform:translate(-50%,-50%)}
-.impact-two{transform:translate(-50%,-50%) scale(1.2)}
-
-/* Keyframe timings */
-.art-ready:not(.is-settled) .arm-left{animation:hand-knocks 3.9s both cubic-bezier(.22,1,.36,1)}
-.art-ready:not(.is-settled) .arm-right{animation:hand-opens 3.9s both cubic-bezier(.22,1,.36,1)}
-.art-ready:not(.is-settled) .knock-copy span:first-child{animation:knock-word .7s .7s both}
-.art-ready:not(.is-settled) .knock-copy span:last-child{animation:knock-word .7s 1.4s both}
-.art-ready:not(.is-settled) .impact-one{animation:impact .35s .85s both}
-.art-ready:not(.is-settled) .impact-two{animation:impact .35s 1.55s both}
-.art-ready:not(.is-settled) .landing-wordmark{animation:reveal-wordmark .8s 2.25s both cubic-bezier(.22,1,.36,1)}
-
-.is-settled .arm-left{opacity:1;transform:translate(var(--hand-left),var(--hand-drop)) rotate(var(--hand-angle))}
-.is-settled .arm-right{opacity:1;transform:translate(var(--hand-right),var(--hand-drop)) scaleX(-1) rotate(var(--hand-angle))}
-.is-settled .landing-wordmark{opacity:1;pointer-events:auto}
-
-@keyframes hand-knocks{
-  0%{opacity:0;transform:translate(-50%,100%) rotate(-12deg)}
-  12%{opacity:1;transform:translate(-50%,4%) rotate(-7deg) scale(.9)}
-  21%,39%{transform:translate(-50%,0) rotate(-3deg) scale(1.08)}
-  27%,45%{transform:translate(-50%,5%) rotate(-9deg) scale(.94)}
-  54%{transform:translate(-50%,4%) rotate(0) scale(1)}
-  78%,100%{opacity:1;transform:translate(var(--hand-left),var(--hand-drop)) rotate(var(--hand-angle))}
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-@keyframes hand-opens{
-  0%,49%{opacity:0;transform:translate(-50%,6%) scaleX(-1)}
-  54%{opacity:1;transform:translate(-50%,4%) scaleX(-1)}
-  78%,100%{opacity:1;transform:translate(var(--hand-right),var(--hand-drop)) scaleX(-1) rotate(var(--hand-angle))}
+.brand-chakra {
+  font-size: 26px;
+  color: #eab308;
 }
 
-@keyframes knock-word{0%{opacity:0}10%,70%{opacity:1}100%{opacity:0}}
-@keyframes impact{0%{opacity:0}15%,55%{opacity:1}100%{opacity:0}}
-@keyframes reveal-wordmark{
-  from{opacity:0;transform:scale(.55) rotate(4deg)}
-  70%{opacity:1;transform:scale(1.03) rotate(-1deg)}
-  to{opacity:1;transform:scale(1) rotate(0)}
+.brand-title {
+  font-family: 'Yatra One', cursive;
+  font-size: 26px;
+  margin: 0;
+  line-height: 1;
+  color: #fff9e6;
+  letter-spacing: 0.04em;
+  text-shadow: 2px 2px 0 #991b1b;
 }
 
-/* ── Right-Side Adda Card (In-Viewport) ──────── */
-.landing-adda-dock{
-  width:100%;
-  display:flex;
-  justify-content:center;
+.brand-sub {
+  font-size: 11px;
+  color: #cbd5e1;
+  font-weight: 600;
+  letter-spacing: 0.05em;
 }
 
-.adda-card-frame{
-  width:min(440px,100%);
-  background:#fff9eb;
-  border:2.5px solid #203a30;
-  border-radius:255px 15px 225px 15px / 15px 225px 15px 255px;
-  box-shadow:7px 8px 0 #1b3027, inset 0 0 10px rgba(220,185,125,0.3);
-  padding:20px 24px;
+.badge-btn {
+  background: #f3ca40;
+  color: #1a2f26;
+  border: 1.5px solid #854d0e;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-weight: 700;
+  font-size: 11px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 #713f12;
+  transition: transform 0.1s ease;
 }
 
-.adda-card-header{
-  margin-bottom:12px;
-  text-align:center;
+.badge-btn:hover {
+  transform: translate(-1px, -1px);
 }
 
-.adda-stamp{
-  font:700 10px 'Yatra One', cursive;
-  background:#b83a24;
-  color:#fff7e6;
-  padding:2px 8px;
-  border-radius:3px;
-  border:1px dashed #ffd899;
-  letter-spacing:0.06em;
-  display:inline-block;
-  transform:rotate(-2deg);
+/* Main Content: Single Viewport 2-Column Grid */
+.hero-viewport {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: center;
+  gap: 3vw;
+  padding: 12px 4vw;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
 }
 
-.adda-card-header h2{
-  font:800 24px/1.1 'Yatra One', 'Baloo 2', cursive;
-  color:#203a30;
-  margin:4px 0 2px;
+/* Left Section: Mohalla Lore Poster */
+.hero-left {
+  display: flex;
+  align-items: center;
 }
 
-.adda-sub{
-  font-size:11px;
-  color:#75583b;
-  margin:0;
+.hero-poster {
+  background: rgba(255, 250, 240, 0.92);
+  border: 3px solid #854d0e;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  box-shadow: 7px 8px 0 #451a03, inset 0 0 15px rgba(217, 119, 6, 0.15);
+  padding: 26px 30px;
 }
 
-/* Join card inside frame */
-.adda-card-body .join-card{
-  border:0;
-  box-shadow:none;
-  padding:0;
-  background:transparent;
-  max-width:none;
+.poster-pill {
+  display: inline-block;
+  background: #b91c1c;
+  color: #fef3c7;
+  padding: 4px 12px;
+  font-family: 'Yatra One', cursive;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  border: 1px dashed #fde68a;
+  border-radius: 4px;
+  transform: rotate(-2deg);
+  margin-bottom: 12px;
 }
 
-.adda-card-body .join-card label{
-  font:700 11px 'DM Sans',sans-serif;
-  color:#31483e;
+.poster-headline {
+  font-family: 'Yatra One', cursive;
+  font-size: clamp(28px, 3.2vw, 42px);
+  line-height: 1.15;
+  color: #1e3a2f;
+  margin: 0 0 12px 0;
+  text-shadow: 1px 1px 0 #fff;
 }
 
-.adda-card-body .join-card input:not([type=checkbox]){
-  background:#fffef9;
-  border:1.5px solid #b8a27a;
-  border-radius:4px;
-  padding:8px 10px;
-  color:#1e342a;
-  font-size:13px;
+.poster-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #573c24;
+  margin-bottom: 20px;
 }
 
-.adda-card-body .color-label{
-  font:700 11px 'DM Sans',sans-serif;
-  color:#31483e;
-  margin:8px 0 4px;
+.poster-desc strong {
+  color: #b91c1c;
 }
 
-.adda-card-body .swatches{
-  margin-bottom:10px;
+.feature-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.adda-card-body .play-mode{
-  margin:6px 0 10px;
+.f-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff8eb;
+  border: 1.5px solid #d97706;
+  border-radius: 8px;
+  padding: 8px 14px;
 }
 
-.adda-card-body .play-mode legend{
-  font-size:11px;
-  color:#31483e;
-  font-weight:700;
-  margin-bottom:5px;
+.f-icon {
+  font-size: 22px;
 }
 
-.adda-card-body .play-mode button{
-  padding:7px 5px;
-  font-size:10px;
-  min-height:36px;
-  border:1.5px solid #a38c64;
+.f-badge strong {
+  display: block;
+  font-size: 13px;
+  color: #78350f;
 }
 
-.adda-card-body .play-mode button[aria-pressed=true]{
-  background:#1e3b30;
-  color:#fffaf0;
-  border-color:#1e3b30;
+.f-badge small {
+  font-size: 11px;
+  color: #854d0e;
 }
 
-.adda-card-body .play-mode p{
-  display:none; /* Keep compact */
+/* Right Section: Adda Card */
+.hero-right {
+  display: flex;
+  justify-content: center;
 }
 
-.adda-card-body .join-actions{
-  margin-top:6px;
+.adda-card {
+  width: 100%;
+  max-width: 440px;
+  background: #fffcf5;
+  border: 3px solid #1c3228;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  box-shadow: 8px 9px 0 #112019;
+  padding: 22px 24px;
 }
 
-.adda-card-body .primary{
-  background:#b83a24;
-  color:#fffaf0;
-  font:700 13px 'Baloo 2',sans-serif;
-  border:1.5px solid #731e0f;
-  box-shadow:3px 3px 0 #57160a;
-  padding:10px;
-  min-height:42px;
+.adda-card-tag {
+  display: inline-block;
+  background: #d97706;
+  color: #fffaf0;
+  font-family: 'Yatra One', cursive;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px dashed #fff;
+  transform: rotate(-1.5deg);
+  margin-bottom: 4px;
 }
 
-.adda-card-body .primary:hover{
-  background:#992c19;
+.adda-heading {
+  font-family: 'Yatra One', cursive;
+  font-size: 24px;
+  color: #1c3228;
+  margin: 2px 0 4px 0;
 }
 
-.adda-card-body .join-inline input{
-  border:1.5px solid #b8a27a;
-  background:#fffef9;
+.adda-subtitle {
+  font-size: 11px;
+  color: #78350f;
+  margin: 0 0 12px 0;
 }
 
-.adda-card-body .join-inline button{
-  background:#1e3b30;
-  color:#fffaf0;
-  font-size:12px;
+/* Form Styles inside Adda Card */
+.adda-form-container .join-card {
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  background: transparent;
+  max-width: none;
 }
 
-/* ── Truck Art Bottom Ribbon ────────────────── */
-.landing-footer{
-  position:relative;
-  z-index:10;
-  width:100%;
-  flex-shrink:0;
-  background:#1c332b;
-  color:#f8d878;
-  padding:6px 0;
-  border-top:2px dashed #f8d878;
-  text-align:center;
+.adda-form-container .join-card label {
+  font: 700 11px 'DM Sans', sans-serif;
+  color: #1c3228;
 }
 
-.footer-ribbon{
-  font:700 11px/1 'Yatra One', 'Baloo 2', cursive;
-  letter-spacing:0.12em;
-  white-space:nowrap;
-  overflow:hidden;
+.adda-form-container .join-card input:not([type=checkbox]) {
+  background: #fff;
+  border: 1.5px solid #a88960;
+  border-radius: 4px;
+  padding: 8px 10px;
+  color: #1c3228;
+  font-size: 13px;
 }
 
-/* ── Mobile Viewport Scaling (Single Screen) ── */
-@media(max-width:850px){
-  .landing-viewport-stage{
-    grid-template-columns:1fr;
-    grid-template-rows:auto 1fr;
-    height:auto;
-    max-height:none;
-    overflow-y:auto;
-    padding-bottom:10px;
+.adda-form-container .color-label {
+  font: 700 11px 'DM Sans', sans-serif;
+  color: #1c3228;
+  margin: 8px 0 4px;
+}
+
+.adda-form-container .swatches {
+  margin-bottom: 10px;
+}
+
+.adda-form-container .play-mode {
+  margin: 6px 0 10px;
+}
+
+.adda-form-container .play-mode legend {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1c3228;
+  margin-bottom: 5px;
+}
+
+.adda-form-container .play-mode button {
+  padding: 7px 5px;
+  font-size: 10px;
+  min-height: 36px;
+  border: 1.5px solid #a88960;
+  background: #fffaf0;
+}
+
+.adda-form-container .play-mode button[aria-pressed=true] {
+  background: #1c3228;
+  color: #fffaf0;
+  border-color: #1c3228;
+}
+
+.adda-form-container .play-mode p {
+  display: none; /* Keep clean */
+}
+
+.adda-form-container .primary {
+  background: #b91c1c;
+  color: #fffaf0;
+  font: 700 13px 'Baloo 2', sans-serif;
+  border: 1.5px solid #7f1d1d;
+  box-shadow: 3px 3px 0 #450a0a;
+  padding: 10px;
+  min-height: 42px;
+}
+
+.adda-form-container .primary:hover {
+  background: #991b1b;
+}
+
+.adda-form-container .join-inline input {
+  border: 1.5px solid #a88960;
+  background: #fff;
+}
+
+.adda-form-container .join-inline button {
+  background: #1c3228;
+  color: #fffaf0;
+  font-size: 12px;
+}
+
+/* Footer: Truck Art Band */
+.site-footer {
+  width: 100%;
+  flex-shrink: 0;
+  background: #1c3228;
+  color: #fde047;
+  padding: 6px 0;
+  border-top: 2.5px dashed #fde047;
+  text-align: center;
+  font-family: 'Yatra One', cursive;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Responsive Scaling for smaller screens */
+@media(max-width: 860px) {
+  .real-mohalla-site {
+    height: auto;
+    min-height: 100svh;
+    max-height: none;
+    overflow-y: auto;
   }
-  .knock-landing{
-    height:auto;
-    min-height:100svh;
-    max-height:none;
-    overflow-y:auto;
+  .landing-root {
+    height: auto;
+    min-height: 100svh;
+    max-height: none;
+    overflow-y: auto;
   }
-  .knock-theatre{
-    height:220px;
-    margin-top:10px;
+  .hero-viewport {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 16px 20px;
   }
-  .knocking-arm{display:none} /* Clean mobile stage */
-  .landing-wordmark h1{font-size:48px}
-  .wordmark-prelude{font-size:16px}
-  .wordmark-caption{font-size:11px;margin:8px 0 0}
-  .adda-card-frame{padding:16px}
-  .footer-ribbon{font-size:9px}
+  .poster-headline {
+    font-size: 26px;
+  }
+  .feature-badges {
+    display: none;
+  }
+  .site-footer {
+    font-size: 9px;
+  }
 }
-
-.hand-unavailable .knocking-arm{display:none}
