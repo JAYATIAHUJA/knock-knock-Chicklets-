@@ -1,39 +1,229 @@
 .app:not(.in-game)>header{display:none}
-.knock-landing{--ink:#213c32;--sheet:#efce55;--hand-left:-158%;--hand-right:58%;--hand-drop:28%;--hand-angle:-30deg;position:relative;isolation:isolate;background:var(--sheet);color:var(--ink);min-height:100svh;overflow:hidden;font-family:'DM Sans',sans-serif}
-.knock-landing::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:5;opacity:.065;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23000' filter='url(%23n)' opacity='.65' d='M0 0h180v180H0z'/%3E%3C/svg%3E")}
-.landing-nav{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;padding:27px 4vw;gap:20px}
-.landing-signature{font:700 20px 'Baloo 2',sans-serif;transform:rotate(-3deg)}
-.landing-text-button,.landing-footer button{border:0;background:transparent;color:var(--ink);font:600 12px 'DM Sans',sans-serif;padding:10px 0;cursor:pointer}
-.landing-text-button span{margin-left:8px;font-size:19px}
-.knock-theatre{position:relative;height:max(620px,calc(100svh - 150px));max-height:1000px;display:flex;align-items:center;flex-direction:column;justify-content:center}
-.landing-wordmark{position:absolute;top:22%;left:0;width:100%;text-align:center;z-index:2;opacity:0}
-.wordmark-prelude{font:600 clamp(16px,1.6vw,23px) 'Baloo 2',sans-serif;margin:0 0 4px;transform:rotate(-4deg)}
-.landing-wordmark h1{position:relative;display:inline-flex;margin:0;font:1000 clamp(64px,13.6vw,205px)/.9 'Arial Black','DM Sans',sans-serif;letter-spacing:-.075em;color:var(--ink);padding:0 .09em 0 0;transform:rotate(-3deg)}
+
+.knock-landing{
+  --ink:#1a2e26;
+  --sheet:#f3ca40;
+  --terracotta:#b83a24;
+  --hand-left:-135%;
+  --hand-right:45%;
+  --hand-drop:25%;
+  --hand-angle:-28deg;
+  position:relative;
+  isolation:isolate;
+  background:var(--sheet);
+  color:var(--ink);
+  height:100svh;
+  max-height:100svh;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  font-family:'DM Sans',sans-serif;
+}
+
+/* Background grain & street feel */
+.knock-landing::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:1;
+  opacity:.075;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23000' filter='url(%23n)' opacity='.65' d='M0 0h180v180H0z'/%3E%3C/svg%3E");
+}
+
+/* ── Desi Nav Bar ────────────────────────────── */
+.landing-nav{
+  position:relative;
+  z-index:10;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 3vw;
+  flex-shrink:0;
+}
+
+.desi-badge{
+  background:#233d32;
+  color:#fff2d0;
+  padding:6px 14px;
+  border-radius:20px;
+  border:1.5px dashed #f6d88c;
+  box-shadow:3px 3px 0 #12211b;
+  transform:rotate(-2deg);
+}
+
+.landing-signature{
+  font:700 15px 'Yatra One', 'Baloo 2', cursive;
+  letter-spacing:0.04em;
+}
+
+.landing-text-button{
+  border:1.5px solid #233d32;
+  background:#fff7e0;
+  color:#233d32;
+  font:700 12px 'DM Sans',sans-serif;
+  padding:6px 14px;
+  border-radius:20px;
+  cursor:pointer;
+  box-shadow:2px 2px 0 #233d32;
+  transition:transform 0.1s ease;
+}
+
+.landing-text-button:hover{
+  transform:translate(-1px,-1px);
+  box-shadow:3px 3px 0 #233d32;
+}
+
+/* ── Single Viewport Stage Layout ───────────── */
+.landing-viewport-stage{
+  position:relative;
+  z-index:5;
+  flex:1;
+  display:grid;
+  grid-template-columns:1.15fr 0.85fr;
+  align-items:center;
+  padding:0 3vw;
+  gap:2vw;
+  height:calc(100svh - 90px);
+  max-height:calc(100svh - 90px);
+}
+
+/* ── Knock Theatre (Left side) ──────────────── */
+.knock-theatre{
+  position:relative;
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+.landing-wordmark{
+  position:relative;
+  text-align:center;
+  z-index:2;
+  opacity:0;
+}
+
+.wordmark-prelude{
+  font:700 clamp(18px,2vw,26px) 'Yatra One', 'Baloo 2', cursive;
+  color:#732313;
+  margin:0 0 6px;
+  transform:rotate(-3deg);
+  text-shadow:1px 1px 0 #ffd782;
+}
+
+.landing-wordmark h1{
+  position:relative;
+  display:inline-flex;
+  margin:0;
+  font:900 clamp(56px,8.5vw,130px)/.9 'Yatra One', 'Baloo 2', cursive;
+  letter-spacing:-.02em;
+  color:#1c332b;
+  text-shadow:4px 4px 0 #b33924, 6px 6px 0 #4a140b;
+  transform:rotate(-2deg);
+}
+
 .landing-wordmark h1>span{display:inline-block;transform-origin:50% 90%}
-.landing-wordmark h1>span:nth-child(3n+2){transform:rotate(4deg) translateY(-.025em)}
-.landing-wordmark h1>span:nth-child(3n){transform:rotate(-4deg) translateY(.025em)}
-.wordmark-dot{position:absolute;right:-.28em;top:-.12em;font-size:.28em;color:#bc3e28}
-.wordmark-caption{font-size:clamp(13px,1.25vw,18px);margin:30px 0 0;letter-spacing:.04em}
-.knocking-arm{position:absolute;width:clamp(230px,31vw,440px);height:600px;left:50%;top:8%;transform-origin:50% 85%;pointer-events:none;z-index:3;opacity:0}
-.knocking-arm img{display:block;width:100%;height:100%;object-fit:contain;object-position:top;filter:drop-shadow(10px 17px 8px #3c301522);user-select:none}
+.landing-wordmark h1>span:nth-child(3n+2){transform:rotate(3deg) translateY(-.02em)}
+.landing-wordmark h1>span:nth-child(3n){transform:rotate(-3deg) translateY(.02em)}
+
+.wordmark-dot{
+  position:absolute;
+  right:-.24em;
+  top:-.08em;
+  font-size:.28em;
+  color:#b83a24;
+}
+
+.wordmark-caption{
+  font:700 clamp(12px,1.2vw,16px) 'DM Sans',sans-serif;
+  margin:18px 0 0;
+  color:#3a4e44;
+  letter-spacing:.04em;
+  background:#fff5db;
+  display:inline-block;
+  padding:6px 14px;
+  border-radius:4px;
+  border:1px dashed #7a5824;
+  transform:rotate(1deg);
+}
+
+/* The iconic animated knocking hands */
+.knocking-arm{
+  position:absolute;
+  width:clamp(200px,26vw,380px);
+  height:540px;
+  left:50%;
+  top:5%;
+  transform-origin:50% 85%;
+  pointer-events:none;
+  z-index:3;
+  opacity:0;
+}
+
+.knocking-arm img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:top;
+  filter:drop-shadow(8px 14px 10px rgba(50,38,16,0.3));
+  user-select:none;
+}
+
 .arm-left{transform:translate(-50%,100%) rotate(-12deg)}
 .arm-right{transform:translate(-50%,100%) scaleX(-1) rotate(-12deg)}
-.knock-copy{position:absolute;top:21%;left:50%;transform:translateX(-50%);z-index:4;font:800 clamp(45px,7vw,90px)/.9 'Baloo 2',sans-serif;pointer-events:none;white-space:nowrap}
+
+.knock-copy{
+  position:absolute;
+  top:20%;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:4;
+  font:900 clamp(50px,7.5vw,95px)/.9 'Yatra One', 'Baloo 2', cursive;
+  color:#992415;
+  text-shadow:3px 3px 0 #fbe6a2, 5px 5px 0 #3a0d06;
+  pointer-events:none;
+  white-space:nowrap;
+}
+
 .knock-copy span{display:block;opacity:0}
-.knock-copy span:first-child{transform:translate(-115%,-25%) rotate(-12deg)}
-.knock-copy span:last-child{transform:translate(110%,45%) rotate(9deg)}
-.knock-impact{position:absolute;z-index:4;top:20%;left:50%;width:145px;height:120px;opacity:0;pointer-events:none}
-.knock-impact i{position:absolute;display:block;background:var(--ink);width:5px;height:35px;border-radius:50%;top:0;left:65px;transform:rotate(-5deg)}
+.knock-copy span:first-child{transform:translate(-110%,-20%) rotate(-12deg)}
+.knock-copy span:last-child{transform:translate(105%,40%) rotate(9deg)}
+
+.knock-impact{
+  position:absolute;
+  z-index:4;
+  top:18%;
+  left:50%;
+  width:145px;
+  height:120px;
+  opacity:0;
+  pointer-events:none;
+}
+
+.knock-impact i{
+  position:absolute;
+  display:block;
+  background:#992415;
+  width:6px;
+  height:36px;
+  border-radius:50%;
+  top:0;
+  left:65px;
+  transform:rotate(-5deg);
+}
+
 .knock-impact i:first-child{left:10px;top:22px;transform:rotate(-48deg)}
 .knock-impact i:last-child{left:122px;top:17px;transform:rotate(43deg)}
-.impact-one{transform:translate(-50%,-50%)}.impact-two{transform:translate(-50%,-50%) scale(1.2)}
-.landing-invitation{position:absolute;top:60%;z-index:4;display:flex;align-items:center;flex-direction:column;opacity:0;pointer-events:none;padding:0 20px;text-align:center}
-.invitation-line{font:600 22px 'Baloo 2',sans-serif;transform:rotate(-4deg);margin-bottom:12px}
-.landing-play{min-width:240px;display:flex;align-items:center;justify-content:space-between;gap:45px;padding:18px 25px;border:2px solid var(--ink);border-radius:2px;background:var(--ink);color:#fff8df;font:700 17px 'DM Sans',sans-serif;box-shadow:5px 5px 0 var(--sheet),6px 6px 0 var(--ink);cursor:pointer;transition:transform .16s,box-shadow .16s}
-.landing-play span{font-size:25px}.landing-play:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--sheet),3px 3px 0 var(--ink)}
-.landing-invitation>p{font-size:11px;line-height:1.6;margin-top:22px;max-width:280px}
-.landing-footer{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;margin:0 4vw;padding:8px 0 20px;gap:18px;font-size:11px;border-top:1px solid #213c3240}
-.landing-footer button{font-size:11px}
+
+.impact-one{transform:translate(-50%,-50%)}
+.impact-two{transform:translate(-50%,-50%) scale(1.2)}
+
+/* Keyframe timings */
 .art-ready:not(.is-settled) .arm-left{animation:hand-knocks 3.9s both cubic-bezier(.22,1,.36,1)}
 .art-ready:not(.is-settled) .arm-right{animation:hand-opens 3.9s both cubic-bezier(.22,1,.36,1)}
 .art-ready:not(.is-settled) .knock-copy span:first-child{animation:knock-word .7s .7s both}
@@ -41,33 +231,215 @@
 .art-ready:not(.is-settled) .impact-one{animation:impact .35s .85s both}
 .art-ready:not(.is-settled) .impact-two{animation:impact .35s 1.55s both}
 .art-ready:not(.is-settled) .landing-wordmark{animation:reveal-wordmark .8s 2.25s both cubic-bezier(.22,1,.36,1)}
-.art-ready:not(.is-settled) .landing-invitation{animation:invitation-in .55s 3.15s both}
+
 .is-settled .arm-left{opacity:1;transform:translate(var(--hand-left),var(--hand-drop)) rotate(var(--hand-angle))}
 .is-settled .arm-right{opacity:1;transform:translate(var(--hand-right),var(--hand-drop)) scaleX(-1) rotate(var(--hand-angle))}
-.is-settled .landing-wordmark,.is-settled .landing-invitation{opacity:1;pointer-events:auto}
-@keyframes hand-knocks{0%{opacity:0;transform:translate(-50%,100%) rotate(-12deg)}12%{opacity:1;transform:translate(-50%,4%) rotate(-7deg) scale(.9)}21%,39%{transform:translate(-50%,0) rotate(-3deg) scale(1.08)}27%,45%{transform:translate(-50%,5%) rotate(-9deg) scale(.94)}54%{transform:translate(-50%,4%) rotate(0) scale(1)}78%,100%{opacity:1;transform:translate(var(--hand-left),var(--hand-drop)) rotate(var(--hand-angle))}}
-@keyframes hand-opens{0%,49%{opacity:0;transform:translate(-50%,6%) scaleX(-1)}54%{opacity:1;transform:translate(-50%,4%) scaleX(-1)}78%,100%{opacity:1;transform:translate(var(--hand-right),var(--hand-drop)) scaleX(-1) rotate(var(--hand-angle))}}
+.is-settled .landing-wordmark{opacity:1;pointer-events:auto}
+
+@keyframes hand-knocks{
+  0%{opacity:0;transform:translate(-50%,100%) rotate(-12deg)}
+  12%{opacity:1;transform:translate(-50%,4%) rotate(-7deg) scale(.9)}
+  21%,39%{transform:translate(-50%,0) rotate(-3deg) scale(1.08)}
+  27%,45%{transform:translate(-50%,5%) rotate(-9deg) scale(.94)}
+  54%{transform:translate(-50%,4%) rotate(0) scale(1)}
+  78%,100%{opacity:1;transform:translate(var(--hand-left),var(--hand-drop)) rotate(var(--hand-angle))}
+}
+
+@keyframes hand-opens{
+  0%,49%{opacity:0;transform:translate(-50%,6%) scaleX(-1)}
+  54%{opacity:1;transform:translate(-50%,4%) scaleX(-1)}
+  78%,100%{opacity:1;transform:translate(var(--hand-right),var(--hand-drop)) scaleX(-1) rotate(var(--hand-angle))}
+}
+
 @keyframes knock-word{0%{opacity:0}10%,70%{opacity:1}100%{opacity:0}}
 @keyframes impact{0%{opacity:0}15%,55%{opacity:1}100%{opacity:0}}
-@keyframes reveal-wordmark{from{opacity:0;transform:scale(.55) rotate(4deg)}70%{opacity:1;transform:scale(1.035) rotate(-1deg)}to{opacity:1;transform:scale(1) rotate(0)}}
-@keyframes invitation-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0);pointer-events:auto}}
-.landing-join{width:min(510px,calc(100% - 28px));max-height:calc(100dvh - 32px);padding:0;border:0;border-radius:4px;background:#fff9e9;color:#213c32;box-shadow:14px 14px 0 #15291f50;overflow:auto}
-.landing-join::backdrop{background:#142d26b8;backdrop-filter:blur(5px)}
-.landing-join-inner{padding:30px;position:relative}
-.landing-close{position:absolute;right:13px;top:10px;border:0;background:none;color:#213c32;font-size:30px;width:40px;height:40px;cursor:pointer}
-.join-handwritten{font:600 20px 'Baloo 2';margin:0;transform:rotate(-3deg)}
-.landing-join h2{font:800 35px/1.1 'Baloo 2';margin:10px 0 20px;color:#213c32}
-.landing-join .join-card{border:0;box-shadow:none;padding:0;background:transparent;max-width:none}
-.landing-join .join-card input:not([type=checkbox]){background:transparent;border:0;border-bottom:1px solid #b1b59b;border-radius:0;color:#213c32}
-.landing-join .primary{background:#213c32;color:#fff9e9;box-shadow:none;letter-spacing:0;font-size:11px;padding:16px;min-height:46px}
-.landing-join .join-inline button{background:#d8ba54;color:#213c32}
-.landing-join .join-actions{flex-direction:column}.landing-join .join-inline{min-height:44px}
-.landing-join .play-mode button[aria-pressed=true]{background:#213c32;border-color:#213c32}
-.landing-join .play-mode p{max-width:none}.landing-join .dev{line-height:1.5;flex-wrap:wrap}
-.knock-landing button:focus-visible{outline:3px solid #b43c25;outline-offset:5px}
-@media(hover:hover) and (pointer:fine){.landing-play:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--sheet),8px 8px 0 var(--ink)}.landing-text-button:hover,.landing-footer button:hover{text-decoration:underline;text-underline-offset:4px}}
-@media(max-width:700px){.knock-landing{--hand-left:-100%;--hand-right:0%;--hand-drop:65%;--hand-angle:-18deg}.landing-nav{padding:18px 22px}.landing-signature{font-size:17px}.landing-text-button{font-size:11px}.knock-theatre{height:max(570px,calc(100svh - 135px))}.landing-wordmark{top:25%}.landing-wordmark h1{font-size:14vw}.wordmark-caption{margin-top:20px;font-size:12px}.wordmark-prelude{font-size:18px}.knocking-arm{width:230px;height:440px;top:12%}.is-settled .arm-left{transform:translate(var(--hand-left),var(--hand-drop)) rotate(var(--hand-angle))}.is-settled .arm-right{transform:translate(var(--hand-right),var(--hand-drop)) scaleX(-1) rotate(var(--hand-angle))}.landing-invitation{top:58%}.invitation-line{font-size:19px}.landing-play{min-width:220px;font-size:16px}.landing-footer{margin:0 22px;font-size:9px}.knock-copy{top:22%;font-size:42px}.knock-copy span:first-child{transform:translate(-65%,-25%) rotate(-12deg)}.knock-copy span:last-child{transform:translate(65%,45%) rotate(9deg)}.landing-join-inner{padding:25px 20px}.landing-join h2{font-size:31px}}
-@media(prefers-reduced-motion:reduce){.knock-landing *, .knock-landing *::before{animation:none!important;transition:none!important}.knock-copy,.knock-impact{display:none}.landing-wordmark,.landing-invitation{opacity:1;pointer-events:auto}}
+@keyframes reveal-wordmark{
+  from{opacity:0;transform:scale(.55) rotate(4deg)}
+  70%{opacity:1;transform:scale(1.03) rotate(-1deg)}
+  to{opacity:1;transform:scale(1) rotate(0)}
+}
 
-.knock-landing .landing-join .primary{background:#213c32;color:#fff9e9}
+/* ── Right-Side Adda Card (In-Viewport) ──────── */
+.landing-adda-dock{
+  width:100%;
+  display:flex;
+  justify-content:center;
+}
+
+.adda-card-frame{
+  width:min(440px,100%);
+  background:#fff9eb;
+  border:2.5px solid #203a30;
+  border-radius:255px 15px 225px 15px / 15px 225px 15px 255px;
+  box-shadow:7px 8px 0 #1b3027, inset 0 0 10px rgba(220,185,125,0.3);
+  padding:20px 24px;
+}
+
+.adda-card-header{
+  margin-bottom:12px;
+  text-align:center;
+}
+
+.adda-stamp{
+  font:700 10px 'Yatra One', cursive;
+  background:#b83a24;
+  color:#fff7e6;
+  padding:2px 8px;
+  border-radius:3px;
+  border:1px dashed #ffd899;
+  letter-spacing:0.06em;
+  display:inline-block;
+  transform:rotate(-2deg);
+}
+
+.adda-card-header h2{
+  font:800 24px/1.1 'Yatra One', 'Baloo 2', cursive;
+  color:#203a30;
+  margin:4px 0 2px;
+}
+
+.adda-sub{
+  font-size:11px;
+  color:#75583b;
+  margin:0;
+}
+
+/* Join card inside frame */
+.adda-card-body .join-card{
+  border:0;
+  box-shadow:none;
+  padding:0;
+  background:transparent;
+  max-width:none;
+}
+
+.adda-card-body .join-card label{
+  font:700 11px 'DM Sans',sans-serif;
+  color:#31483e;
+}
+
+.adda-card-body .join-card input:not([type=checkbox]){
+  background:#fffef9;
+  border:1.5px solid #b8a27a;
+  border-radius:4px;
+  padding:8px 10px;
+  color:#1e342a;
+  font-size:13px;
+}
+
+.adda-card-body .color-label{
+  font:700 11px 'DM Sans',sans-serif;
+  color:#31483e;
+  margin:8px 0 4px;
+}
+
+.adda-card-body .swatches{
+  margin-bottom:10px;
+}
+
+.adda-card-body .play-mode{
+  margin:6px 0 10px;
+}
+
+.adda-card-body .play-mode legend{
+  font-size:11px;
+  color:#31483e;
+  font-weight:700;
+  margin-bottom:5px;
+}
+
+.adda-card-body .play-mode button{
+  padding:7px 5px;
+  font-size:10px;
+  min-height:36px;
+  border:1.5px solid #a38c64;
+}
+
+.adda-card-body .play-mode button[aria-pressed=true]{
+  background:#1e3b30;
+  color:#fffaf0;
+  border-color:#1e3b30;
+}
+
+.adda-card-body .play-mode p{
+  display:none; /* Keep compact */
+}
+
+.adda-card-body .join-actions{
+  margin-top:6px;
+}
+
+.adda-card-body .primary{
+  background:#b83a24;
+  color:#fffaf0;
+  font:700 13px 'Baloo 2',sans-serif;
+  border:1.5px solid #731e0f;
+  box-shadow:3px 3px 0 #57160a;
+  padding:10px;
+  min-height:42px;
+}
+
+.adda-card-body .primary:hover{
+  background:#992c19;
+}
+
+.adda-card-body .join-inline input{
+  border:1.5px solid #b8a27a;
+  background:#fffef9;
+}
+
+.adda-card-body .join-inline button{
+  background:#1e3b30;
+  color:#fffaf0;
+  font-size:12px;
+}
+
+/* ── Truck Art Bottom Ribbon ────────────────── */
+.landing-footer{
+  position:relative;
+  z-index:10;
+  width:100%;
+  flex-shrink:0;
+  background:#1c332b;
+  color:#f8d878;
+  padding:6px 0;
+  border-top:2px dashed #f8d878;
+  text-align:center;
+}
+
+.footer-ribbon{
+  font:700 11px/1 'Yatra One', 'Baloo 2', cursive;
+  letter-spacing:0.12em;
+  white-space:nowrap;
+  overflow:hidden;
+}
+
+/* ── Mobile Viewport Scaling (Single Screen) ── */
+@media(max-width:850px){
+  .landing-viewport-stage{
+    grid-template-columns:1fr;
+    grid-template-rows:auto 1fr;
+    height:auto;
+    max-height:none;
+    overflow-y:auto;
+    padding-bottom:10px;
+  }
+  .knock-landing{
+    height:auto;
+    min-height:100svh;
+    max-height:none;
+    overflow-y:auto;
+  }
+  .knock-theatre{
+    height:220px;
+    margin-top:10px;
+  }
+  .knocking-arm{display:none} /* Clean mobile stage */
+  .landing-wordmark h1{font-size:48px}
+  .wordmark-prelude{font-size:16px}
+  .wordmark-caption{font-size:11px;margin:8px 0 0}
+  .adda-card-frame{padding:16px}
+  .footer-ribbon{font-size:9px}
+}
+
 .hand-unavailable .knocking-arm{display:none}
