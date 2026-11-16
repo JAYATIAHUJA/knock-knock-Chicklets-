@@ -1,0 +1,109 @@
+/* Quiet HUD: keep the streetscape visible and put instructions near the controls. */
+.scene { isolation: isolate; }
+.in-game header {
+  top: 20px; height: 48px; padding: 0; border: 0; border-radius: 0;
+  background: transparent; box-shadow: none; color: #fff;
+  text-shadow: 0 2px 8px #18231c80;
+}
+.in-game .brand { gap: 10px; background: #202d25e8; padding: 10px 16px; border-radius: 8px; }
+.in-game .brand-icon { color: #eac68a; font-size: 28px; }
+.in-game .brand strong { font: 800 19px 'DM Sans', sans-serif; letter-spacing: .12em; }
+.in-game .brand small { font-size: 11px; color: #c6c8b5; }
+.in-game .room-code { background: #202d25e8; padding: 9px 12px; border-radius: 8px; text-shadow: none; }
+.in-game .room-code button { color: #eee9dc; border-color: #ffffff30; border-radius: 4px; }
+.in-game .sidebar { top: 88px; width: 242px; padding: 16px; border: 1px solid #ffffff24; background: #202d25ed; color: #eeeee5; border-radius: 8px; box-shadow: 0 8px 24px #14201826; }
+.in-game .section-title { color: #b8c0ae; font-size: 10px; }
+.in-game .player-row { border-color: #ffffff18; font-size: 12px; padding: 12px 0; }
+.in-game .player-row small { color: #bdc7b8; }
+.in-game .primary { background: #d5ad70; color: #27332a; box-shadow: none; text-shadow: none; border-radius: 5px; font-size: 12px; }
+.in-game .primary:hover { background: #eac690; }
+.in-game .option { background: #ffffff09; color: #f4f1e9; border-color: #ffffff26; border-radius: 5px; }
+.in-game .option:hover { background: #ffffff20; }
+.in-game .note,.in-game .chosen { color: #d6ddce; }
+.in-game .round-guide { top: auto; bottom: 81px; width: 286px; padding: 16px 18px; border: 1px solid #ffffff24; background: #202d25ed; border-radius: 8px; box-shadow: 0 8px 24px #14201826; }
+.in-game .round-guide nav { margin-bottom: 14px; gap: 10px; }
+.in-game .round-guide nav span { color: #8e9b8c; font-size: 9px; gap: 4px; }
+.in-game .round-guide nav b { width: 19px; height: 19px; background: #ffffff12; color: #b8c3b5; }
+.in-game .round-guide nav .current { color: #ead2a8; }
+.in-game .round-guide nav .current b { background: #d5ad70; color: #27332a; box-shadow: none; }
+.in-game .round-guide h2 { color: #f4f1e5; font: 700 20px/1.25 'DM Sans',sans-serif; letter-spacing: -.025em; }
+.in-game .round-guide p { color: #c1cbbc; font-size: 11px; line-height: 1.65; }
+.in-game .secret-reminder { background: #ffffff08; border-color: #b7c3a74d; }
+.in-game .secret-reminder span,.in-game .secret-reminder small { color: #b8c3b1; }
+.in-game .secret-reminder strong { color: #e8c38b; }
+.in-game .controls { background: #202d25e8; color: #d4dccb; font-size: 10px; border-radius: 5px; }
+.in-game .scene-overlay { background: #202d25ed; color: #e0e6d9; border: 1px solid #ffffff24; border-radius: 6px; box-shadow: none; }
+.in-game .phase-chip { border-radius: 3px; background: #d5ad70; color: #27332a; }
+.in-game .nametag { background: #202d25e8; color: #f4f1e5; border: 1px solid #ffffff35; box-shadow: none; font-size: 10px; border-radius: 4px; }
+.in-game .nametag.denner { background: #9c4e34; }
+.in-game .nametag.runner { background: #b38b39; }
+.in-game .modal { background: #243229; color: #f4f1e5; border: 1px solid #ffffff30; border-radius: 10px; box-shadow: 0 24px 80px #0006; }
+.in-game .modal h2,.in-game .modal .close { color: #f4f1e5; }
+.in-game .modal p,.in-game .modal .eyebrow { color: #c1cbbc; }
+.in-game .guess-grid button { background: #ffffff08; border-color: #ffffff24; color: #f4f1e5; border-radius: 5px; }
+.in-game .guess-grid button:hover { background: #d5ad70; color: #27332a; }
+.in-game .chase-note { background: #d5ad70; color: #27332a; border-radius: 5px; font: 700 15px 'DM Sans',sans-serif; }
+.world-loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); padding: 14px 20px; background: #202d25; color: #f4f1e5; white-space: nowrap; border-radius: 8px; font-size: 13px; }
+@media(max-width:800px) {
+  .in-game header { top: 10px; height: 42px; }
+  .in-game .brand { padding: 9px 10px; }
+  .in-game .brand strong { font-size: 14px; }
+  .in-game .brand-icon { font-size: 21px; }
+  .in-game .room-code { padding: 7px; }
+  .in-game .sidebar { top: auto; width: auto; bottom: 10px; padding: 12px; }
+  .in-game .round-guide { top: 70px; bottom: auto; width: 210px; padding: 12px; }
+  .in-game .round-guide h2 { font-size: 16px; }
+  .in-game .round-guide nav { margin-bottom: 10px; }
+}
+/* Knock-knock: handwritten warmth, conversation, and a clear chase handoff. */
+.in-game .brand,.in-game .room-code,.in-game .sidebar,.in-game .round-guide,.in-game .controls,.in-game .scene-overlay {background:#fbf0d9f2;color:#49372a;border-color:#a5885d55;box-shadow:0 4px 18px #4b342924}
+.in-game .brand strong{color:#794532}.in-game .brand small{color:#916342}.in-game .brand-icon{color:#b86a3e}
+.in-game .room-code button{color:#684d36;border-color:#bba27a}.in-game .section-title{color:#8a6c4d}.in-game .player-row{border-color:#bda78044}.in-game .player-row small{color:#8b7356}
+.in-game .round-guide h2{color:#664831;font-family:'Baloo 2',sans-serif;font-size:23px}.in-game .round-guide p,.in-game .note,.in-game .chosen{color:#796448}
+.in-game .round-guide nav span,.in-game .round-guide nav .current{color:#90633f}.in-game .round-guide nav b{background:#decba6;color:#806343}.in-game .round-guide nav .current b{background:#b8673e;color:#fff6df}
+.in-game .primary{background:#ab593c;color:#fff4dd}.in-game .primary:hover{background:#934b32}.in-game .option{background:#fff8e8;color:#654b32;border-color:#cfb994}.in-game .option:hover{background:#ead5af}
+.in-game .secret-reminder{background:#eadfc4;border-color:#a18c61}.in-game .secret-reminder span,.in-game .secret-reminder small{color:#846c49}.in-game .secret-reminder strong{color:#3e6e62}
+.knock-stage{position:fixed;inset:0;z-index:8;display:grid;place-items:center;background:#302c2255;padding:20px;pointer-events:none}.knock-stage.addressed{background:#302c2280;pointer-events:auto}
+.knock-card{width:min(450px,100%);position:relative;background:#fff1d5;color:#5b3d2a;padding:30px;border:2px solid #b99159;border-radius:5px;box-shadow:8px 9px 0 #63493255;animation:knock-in .32s ease-out}
+.knock-card:before{content:'';position:absolute;width:86px;height:24px;top:-12px;left:calc(50% - 43px);background:#d9bd7ec9;transform:rotate(-4deg)}
+.knock-tap{position:absolute;right:22px;top:19px;color:#a75636;font:800 25px 'Baloo 2';transform:rotate(8deg);animation:knock-tap .65s ease-in-out 2}
+.knock-card h2{font:800 40px/1.1 'Baloo 2';margin:18px 0 4px}.knock-from{font-size:11px;max-width:270px;color:#8a694a}.knock-question{font-size:20px;margin:7px 0 18px}.knock-question strong{color:#a45333}.knock-help{font-size:12px;line-height:1.6;color:#82684c}
+.banter-options{display:flex;gap:7px;flex-wrap:wrap;margin:18px 0}.banter-options button{padding:9px 12px;background:#ead8b7;color:#664329;border:1px solid #c7aa7d;border-radius:4px;font-size:12px}
+.knock-card form label{font-size:11px;font-weight:700}.reply-row{display:flex;margin:7px 0 15px;gap:6px}.reply-row input{width:0;flex:1;padding:12px 10px;border:1px solid #bda075;background:#fffaf0;border-radius:4px;color:#513e2b}.reply-row button{padding:10px 14px;border:0;background:#426c5c;color:#fff5dc;border-radius:4px;font-weight:700}.knock-card small{font-size:10px;color:#8c7658}
+.shout-panel{position:absolute;z-index:5;bottom:85px;left:50%;transform:translateX(-50%);width:min(440px,calc(100% - 40px));padding:18px 20px;background:#fff0cfeF;border:2px solid #a96537;border-radius:6px;box-shadow:4px 5px 0 #61412644}.shout-panel h2{font:800 24px/1.2 'Baloo 2';color:#86442f;margin:0 0 7px}.shout-panel p{font-size:11px;color:#826345;line-height:1.5;margin:0 0 12px}.shout-options{display:flex;gap:7px;flex-wrap:wrap}.shout-options button{background:#a65c39;color:#fff5dc;border:0;border-radius:4px;padding:10px 14px;font-size:13px;font-weight:700;touch-action:manipulation}.shout-options button:hover{background:#75412c}.in-game:has(.shout-panel) .round-guide{display:none}
+.speech-bubble{position:relative;background:#fff2d2;color:#65412b;border:2px solid #b99661;padding:9px 13px;border-radius:12px 12px 12px 0;font-size:13px;font-weight:700;width:max-content;max-width:240px;overflow-wrap:anywhere;box-shadow:3px 3px 0 #5b402d33;animation:knock-in .2s ease-out}
+@keyframes knock-in{from{opacity:0;translate:0 10px}to{opacity:1;translate:0 0}}
+@keyframes knock-tap{0%,100%{transform:rotate(8deg) scale(1)}35%{transform:rotate(-8deg) scale(1.12)}65%{transform:rotate(5deg) scale(1)}}
+@media(prefers-reduced-motion:reduce){.knock-card,.knock-tap,.speech-bubble{animation:none}}
+@media(max-width:800px){.knock-card{padding:22px}.knock-card h2{font-size:34px}.knock-tap{font-size:19px}.knock-question{font-size:17px}.shout-panel{top:75px;bottom:auto;width:calc(100% - 20px);padding:12px}.shout-panel h2{font-size:21px}.shout-options button{min-height:44px}.in-game .round-guide h2{font-size:19px}.in-game .brand small{display:none}}
+
+.shout-options kbd{font:700 10px inherit;display:inline-grid;place-items:center;min-width:16px;height:17px;background:#ffffff24;border:1px solid #ffffff40;border-radius:3px;margin-right:3px}.shout-hint{display:block;margin-top:10px;font-size:10px;color:#876749}@media(pointer:coarse){.shout-options kbd{display:none}}
+@media(min-width:801px){.shout-panel{left:auto;right:22px;transform:none;width:300px}.in-game:has(.shout-panel) .sidebar{max-height:calc(100dvh - 440px)}}
+.welcome .welcome-art {
+  background: #f6f0e5 url('/textures/bazaar-front.jpg') center bottom / contain no-repeat;
+  border: 0;
+  border-radius: 4px;
+  height: auto;
+  aspect-ratio: 3 / 1;
+  box-shadow: 0 14px 30px #76563424;
+}
+.welcome h1 em { color: #bd3f37; }
+.welcome .primary { background: #a93236; }
+.welcome .join-inline button { background: #006978; }
+.play-mode{border:0;padding:0;margin:20px 0 12px;min-width:0}
+.play-mode legend{font-size:12px;font-weight:700;margin-bottom:9px;color:#624b37}
+.play-mode>div{display:flex;gap:6px;flex-wrap:wrap}
+.play-mode button{flex:1;padding:10px 8px;background:#fffaf0;color:#65513b;border:1px solid #cbb795;border-radius:5px;font-size:11px;min-height:42px}
+.play-mode button[aria-pressed=true]{background:#315f55;color:#fff7df;border-color:#315f55}
+.play-mode p{font-size:11px;line-height:1.5;color:#7c6951;margin:9px 0}
+.dev[hidden]{display:none}
+@media(max-width:800px){
+  .in-game .sidebar{min-height:0;height:auto;max-height:30dvh;padding:10px;bottom:10px}
+  .in-game .sidebar .primary.wide{margin:0;min-height:44px}
+  .in-game .round-guide{width:min(245px,calc(100% - 20px));padding:10px 12px}
+  .in-game .round-guide nav{margin-bottom:6px}
+  .in-game .round-guide h2{font-size:17px;margin:4px 0}
+  .in-game .round-guide p{margin:4px 0;font-size:10px}
+  .in-game .scene-overlay{bottom:85px;max-width:calc(100% - 20px);font-size:10px}
+  .in-game .controls{display:none}
+}
