@@ -165,7 +165,28 @@ export default function App(){
     </div>
     {room.phase==='lobby'&&<button className="primary wide" onClick={()=>act('ready',!me?.ready)}>{me?.ready?'CANCEL READY':'I\'M READY'} <span>✦</span></button>}
     {room.phase==='category'&&isDenner&&<div className="action-box"><div className="section-title">CHOOSE A CATEGORY</div>{Object.keys(CATEGORIES).map(c=><button className="option" key={c} onClick={()=>act('category',c as Category)}>{c} <span>→</span></button>)}</div>}
-    {room.phase==='identity'&&!isDenner&&<div className="action-box"><div className="section-title">YOUR SECRET {room.category?.toUpperCase()}</div>{identity?<p className="chosen">You chose <b>{identity}</b>. Keep it secret!</p>:(room.category?CATEGORIES[room.category]:[]).map(v=><button className="option" key={v} onClick={()=>act('identity',v)}>{v}<span>→</span></button>)}</div>}
+    {room.phase==='identity'&&!isDenner&&<div className="action-box desi-identity-box">
+      <div className="section-title">CHOOSE SECRET {room.category?.toUpperCase()}</div>
+      {identity?<div className="matchbox-card selected-matchbox">
+        <div className="matchbox-striker"/>
+        <div className="matchbox-label">
+          <span className="matchbox-brand">SECRET TAASH</span>
+          <h3 className="matchbox-text">{identity}</h3>
+          <small className="matchbox-sub">KISI KO MAT BATAANA!</small>
+        </div>
+      </div>:(
+        <div className="matchbox-grid">
+          {(room.category?CATEGORIES[room.category]:[]).map((v, idx)=><button className="matchbox-card" key={v} onClick={()=>act('identity',v)}>
+            <div className="matchbox-striker"/>
+            <div className="matchbox-label">
+              <span className="matchbox-brand">NO. 0{idx+1} · SPECIAL</span>
+              <h4 className="matchbox-text">{v}</h4>
+              <span className="matchbox-tag">CHUNO ➔</span>
+            </div>
+          </button>)}
+        </div>
+      )}
+    </div>}
     {room.phase==='identity'&&isDenner&&<p className="note">Waiting for the others to choose...</p>}
     {room.phase==='guessing'&&isDenner&&<div className="action-box"><div className="section-title">NEARBY PLAYERS</div>{nearby.length?nearby.map(p=><button key={p.id} className="option" onClick={()=>setGuessTarget(p.id)}>Knock knock · {p.name}<span>→</span></button>):<p className="note">Kisi dost ke paas jaao, phir knock karo.</p>}</div>}
     {room.phase==='chase'&&<div className="chase-note">{isDenner?'CHASE THE RUNNER!':playerId===room.runnerId?'ESCAPE THE DENNER!':'WATCH THE CHASE!'}</div>}

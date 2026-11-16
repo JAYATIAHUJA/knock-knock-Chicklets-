@@ -48,9 +48,24 @@ export function Controls({room,id}:{room:PublicRoom;id:string}){
  const button=(key:string,label:string,style?:string)=><button className={`pad-key ${style||''}`} aria-label={label} disabled={!allowed} onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);touch.current.add(key)}} onPointerUp={()=>touch.current.delete(key)} onPointerCancel={()=>touch.current.delete(key)} onLostPointerCapture={()=>touch.current.delete(key)}>{label}</button>;
 
  return <>
-  <div className="controls">
+  <div className="controls desi-controls">
    <div className="controls-label">{allowed?'WASD / ARROWS to move · SHIFT to sprint':'Movement locked this phase'}</div>
-   {allowed&&<div className="stamina-track" title={`Stamina: ${stamina}%`}><div className="stamina-bar" style={{width:`${stamina}%`,background:stamina<25?'#e84d38':stamina<50?'#e89f38':'#4cb372'}}/></div>}
+   {allowed&&<div className="chai-stamina-container" title={`Cutting Chai Stamina: ${stamina}%`}>
+    <div className="chai-glass">
+      <div className="chai-liquid" style={{height:`${stamina}%`}}/>
+      <div className="chai-stripes"/>
+      <div className="chai-steam">♨</div>
+    </div>
+    <div className="chai-meter-wrapper">
+      <div className="chai-label-row">
+        <span>CUTTING CHAI POWER</span>
+        <b>{stamina}%</b>
+      </div>
+      <div className="stamina-track">
+        <div className="stamina-bar" style={{width:`${stamina}%`,background:stamina<25?'#e84d38':stamina<50?'#f59e0b':'#d97706'}}/>
+      </div>
+    </div>
+   </div>}
   </div>
   <div className="touch-controls">
    <div className="dpad">{button('w','↑','up')}{button('a','←','left')}{button('s','↓','down')}{button('d','→','right')}</div>
