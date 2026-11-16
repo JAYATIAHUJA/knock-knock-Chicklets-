@@ -634,3 +634,55 @@ h1, h2, .brand strong, .round-guide h2, .role-label, .recap-header h2 {
   color: #b91c1c;
   letter-spacing: 0.05em;
 }
+
+
+/* ══════════════════════════════════════════════
+   BLUFF & INTERCEPT (SOCIAL DEDUCTION HUD)
+   ══════════════════════════════════════════════ */
+.bluff-intercept-box {
+  margin: 14px 0 10px;
+  background: #fdf5e2;
+  border: 1.5px dashed #b45309;
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.bluff-title {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: #78350f;
+  margin: 0 0 8px 0;
+}
+
+.bluff-options {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.bluff-options button {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  background: #fff;
+  border: 1.5px solid #854d0e;
+  border-radius: 6px;
+  color: #713f12;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 #713f12;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.bluff-options button:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #451a03;
+  background: #fffbef;
+}
+
+.bluff-options button:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #713f12;
+}

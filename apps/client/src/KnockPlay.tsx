@@ -43,14 +43,21 @@ export function KnockPlay({room,id,identity,act}:Props){
   const addressed=knock.targetId===id,denner=knock.dennerId===id;
   const target=room.players.find(p=>p.id===knock.targetId)?.name;
   const asker=room.players.find(p=>p.id===knock.dennerId)?.name;
-  return <div className={`knock-stage ${addressed?'addressed':''}`} role={addressed?'dialog':'status'} aria-modal={addressed||undefined} aria-label="Knock knock">
+  return <div className={`knock-stage ${addressed||!denner?'addressed':''}`} role={addressed?'dialog':'status'} aria-modal={addressed||undefined} aria-label="Knock knock">
    <div className="knock-card" key={knock.id}>
     <span className="knock-tap" aria-hidden="true">ठक ठक!</span>
     <p className="knock-from">{addressed?`${asker} ne tumhari peeth par knock kiya`:denner?`${target} se poochha…`:`${asker} → ${target}`}</p>
     <h2>Knock knock!</h2><p className="knock-question">“Kya tum <strong>{knock.name}</strong> ho?”</p>
     {addressed?<><p className="knock-help">Jawab tumhara. Secret ka faisla game karega!</p><div className="banter-options">{['Nahi ji, galat ghar!','Pehle toffee do!','Pakad ke dikha!'].map(text=><button key={text} disabled={busy} onClick={()=>respond(text)}>{text}</button>)}</div>
       <form onSubmit={event=>{event.preventDefault();void respond(reply)}}><label htmlFor="knock-reply">Apna jawab</label><div className="reply-row"><input id="knock-reply" autoFocus maxLength={120} value={reply} onChange={event=>setReply(event.target.value)} placeholder="Kuch bhi funny bol…"/><button disabled={busy||!reply.trim()} type="submit">Bolo →</button></div></form>
-     </>:<p className="knock-help">{target} ka jawab aa raha hai…</p>}
+     </>:!denner?<div className="bluff-intercept-box">
+      <p className="bluff-title">🕵️‍♂️ Denner ko confuse karo (Social Bluff):</p>
+      <div className="bluff-options">
+       <button onClick={()=>void act('bluff-signal',{type:'nod'})}>👉 "Haan, wahi hai!"</button>
+       <button onClick={()=>void act('bluff-signal',{type:'fake'})}>🙅 "Nahi, galat banda!"</button>
+      </div>
+      <p className="knock-help">{target} ka jawab aa raha hai…</p>
+     </div>:<p className="knock-help">{target} ka jawab aa raha hai…</p>}
     <small>{seconds}s · Phir naam check hoga</small>
    </div>
   </div>;

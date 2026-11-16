@@ -15,6 +15,7 @@ io.on('connection',socket=>{
  socket.on('guess',(value:{targetId:string;identity:string},ack)=>action(()=>{const {game,id}=own();const result=game.knock(id,value.targetId,value.identity);emit(game);return result},ack));
  socket.on('knock-reply',(value:{knockId:string;text:string},ack)=>action(()=>{const {game,id}=own();game.replyKnock(id,value.knockId,value.text);emit(game)},ack));
  socket.on('call-name',(name:string,ack)=>action(()=>{const {game,id}=own();game.callName(id,name);emit(game)},ack));
+ socket.on('bluff-signal',(value:{type:'nod'|'fake'|'whisper';text?:string},ack)=>action(()=>{const {game,id}=own();game.sendBluffSignal(id,value.type,value.text);emit(game)},ack));
  socket.on('input',(value:Input)=>{try{const {game,id}=own();game.input(id,value)}catch{}});
  socket.on('disconnect',()=>{const entry=ownership.get(socket.id);if(!entry)return;ownership.delete(socket.id);const {token,session}=entry;const game=rooms.get(session.code);if(!game)return;session.socketId=null;game.disconnect(session.playerId);emit(game);session.timer=setTimeout(()=>{if(session.socketId)return;sessions.delete(token);game.remove(session.playerId);if(![...game.members.values()].some(p=>!p.bot))rooms.delete(game.code);else emit(game)},GRACE_MS)});
 });
