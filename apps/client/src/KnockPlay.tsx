@@ -1,5 +1,6 @@
 import {useEffect,useRef,useState} from 'react';
 import {CATEGORIES,type PublicRoom} from '@chicklets/shared';
+import {sounds} from './sound';
 
 type Props={room:PublicRoom;id:string;identity:string|null;act:(event:string,value:unknown)=>Promise<void>};
 export function KnockPlay({room,id,identity,act}:Props){
@@ -8,7 +9,14 @@ export function KnockPlay({room,id,identity,act}:Props){
  const callPending=useRef(false);
  const canPass=room.players.some(p=>p.connected&&p.id!==id&&p.id!==room.dennerId);
  const callNames=room.category?CATEGORIES[room.category].filter(name=>name!==identity):[];
- async function shout(name:string){if(callPending.current)return;callPending.current=true;try{await act('call-name',name)}finally{callPending.current=false}}
+
+ async function shout(name:string){
+  if(callPending.current)return;
+  callPending.current=true;
+  sounds.playRelayTransfer();
+  try{await act('call-name',name)}finally{callPending.current=false}
+ }
+
  useEffect(()=>{
   if(room.phase!=='chase'||room.runnerId!==id||!canPass)return;
   const call=(event:KeyboardEvent)=>{
@@ -18,8 +26,19 @@ export function KnockPlay({room,id,identity,act}:Props){
   };
   window.addEventListener('keydown',call);return()=>window.removeEventListener('keydown',call);
  },[room.phase,room.runnerId,room.category,id,identity,canPass,act]);
- useEffect(()=>{setReply('');setBusy(false);if(!knock)return;const update=()=>setSeconds(Math.max(0,Math.ceil((knock.expiresAt-Date.now())/1000)));update();const timer=setInterval(update,250);return()=>clearInterval(timer)},[knock?.id]);
+
+ useEffect(()=>{
+  setReply('');setBusy(false);
+  if(!knock)return;
+  sounds.playKnock();
+  const update=()=>setSeconds(Math.max(0,Math.ceil((knock.expiresAt-Date.now())/1000)));
+  update();
+  const timer=setInterval(update,250);
+  return()=>clearInterval(timer);
+ },[knock?.id]);
+
  async function respond(text:string){if(!knock||busy)return;setBusy(true);try{await act('knock-reply',{knockId:knock.id,text})}finally{setBusy(false)}}
+
  if(knock){
   const addressed=knock.targetId===id,denner=knock.dennerId===id;
   const target=room.players.find(p=>p.id===knock.targetId)?.name;

@@ -90,3 +90,4 @@ npm run build
 ## 🎨 Asset & Licensing Guidelines
 - Only use CC0 or open-source assets with clear attribution.
 - Update `docs/ASSET_CREDITS.md` or attribution sections whenever adding audio, textures, or 3D models.
+

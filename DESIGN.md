@@ -79,3 +79,4 @@ stateDiagram-v2
   - Combined static geometry to minimize draw calls.
   - Instanced rendering for foliage, tree canopies, and repeated architectural props.
   - CSS3D / HTML overlays via React Three Fiber Drei for crisp speech bubbles and legible nametags without font texture blurring.
+

@@ -107,3 +107,43 @@
   .in-game .scene-overlay{bottom:85px;max-width:calc(100% - 20px);font-size:10px}
   .in-game .controls{display:none}
 }
+
+
+/* === Juice & Immersion Additions === */
+
+/* Stamina meter HUD */
+.controls-label { font-size: 10px; margin-bottom: 4px; }
+.stamina-track {
+  width: 100%;
+  height: 5px;
+  background: #00000030;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.stamina-bar {
+  height: 100%;
+  transition: width 0.08s linear, background-color 0.2s ease;
+}
+
+/* Caught tag impact screen flash & shake */
+.caught-flash::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(230, 40, 20, 0.4) 0%, rgba(200, 20, 10, 0.1) 80%);
+  z-index: 100;
+  animation: flash-fade 0.7s ease-out forwards;
+}
+
+@keyframes flash-fade {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Chase mode tension border */
+.chase-active {
+  box-shadow: inset 0 0 35px rgba(210, 60, 20, 0.22);
+  transition: box-shadow 0.4s ease;
+}

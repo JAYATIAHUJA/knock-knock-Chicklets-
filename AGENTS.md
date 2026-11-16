@@ -64,3 +64,4 @@ npm run test -w @chicklets/server -- apps/server/src/bots.test.ts
 | `apps/client/src/Avatar.tsx` | Character rendering, skeletal procedural animations, sprint/speech states. |
 | `apps/client/src/KnockPlay.tsx` | 2D HUD overlays for category choice, knocking dialogues, and quick comebacks. |
 | `apps/client/src/network.ts` | WebSocket client connection and reconciliation handlers. |
+

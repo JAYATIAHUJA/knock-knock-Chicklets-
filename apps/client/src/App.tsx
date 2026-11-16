@@ -1,4 +1,4 @@
-import {useEffect,useState} from 'react';
+import {useEffect,useState,useRef} from 'react';
 import {CATEGORIES,type Category} from '@chicklets/shared';
 import {socket,send,saveSession} from './network';
 import {useGame} from './store';
@@ -6,6 +6,7 @@ import {Scene} from './scene';
 import {RoundGuide} from './RoundGuide';
 import {KnockPlay} from './KnockPlay';
 import {Landing} from './Landing';
+import {sounds} from './sound';
 
 const colors=['#db7857','#6b9b78','#d4a047','#8296bd','#ae82a6','#79aeb2'];
 
@@ -19,29 +20,101 @@ export default function App(){
  const [guessTarget,setGuessTarget]=useState<string|null>(null);
  const [copied,setCopied]=useState(false);
  const [busy,setBusy]=useState(false);
+ const lastPhase=useRef<string>('');
+
  const me=room?.players.find(p=>p.id===playerId);
  const isDenner=playerId===room?.dennerId;
  const nearby=room?.players.filter(p=>p.id!==playerId&&me&&p.connected&&Math.hypot(p.position.x-me.position.x,p.position.z-me.position.z)<2.5)||[];
 
+ useEffect(()=>{
+  if(!room)return;
+  if(room.phase==='chase'&&lastPhase.current!=='chase'){
+   sounds.playChaseAlert();
+  }else if(room.phase==='caught'&&lastPhase.current!=='caught'){
+   sounds.playTagImpact();
+  }
+  lastPhase.current=room.phase;
+ },[room?.phase]);
+
  useEffect(()=>{const fn=()=>setError('Connection lost. Reconnecting…');socket.on('disconnect',fn);return()=>{socket.off('disconnect',fn)}},[setError]);
+
  async function enter(kind:'create'|'join'){
   if(busy)return;setBusy(true);
-  try{setError('');localStorage.setItem('chicklets-name',name);const session=await send(kind,kind==='create'?{name,color,dev,bots}:{name,color,code:code.trim().toUpperCase()}) as {code:string;token:string;playerId:string};saveSession(session);if(kind==='create'){history.replaceState(null,'',`?room=${session.code}`);setCode(session.code)}}catch(e){setError(e instanceof Error?e.message:String(e))}
+  try{
+   setError('');
+   localStorage.setItem('chicklets-name',name);
+   const session=await send(kind,kind==='create'?{name,color,dev,bots}:{name,color,code:code.trim().toUpperCase()}) as {code:string;token:string;playerId:string};
+   saveSession(session);
+   if(kind==='create'){
+    history.replaceState(null,'',`?room=${session.code}`);
+    setCode(session.code);
+   }
+  }catch(e){
+   setError(e instanceof Error?e.message:String(e));
+  }
   setBusy(false);
  }
- async function act(event:string,value:unknown){try{setError('');await send(event,value);if(event==='guess')setGuessTarget(null)}catch(e){setError(e instanceof Error?e.message:String(e))}}
+
+ async function act(event:string,value:unknown){
+  try{
+   setError('');
+   await send(event,value);
+   if(event==='guess')setGuessTarget(null);
+  }catch(e){
+   setError(e instanceof Error?e.message:String(e));
+  }
+ }
+
  const url=room?`${location.origin}?room=${room.code}`:'';
- return <div className={`app ${room?'in-game':''}`} aria-busy={busy}>
-  <header><div className="brand"><span className="brand-icon">✺</span><div><strong>CHICKLETS</strong><small>बचपन वाला knock knock</small></div></div><span className="top-note">A LITTLE GAME FROM THE MOHALLA</span>{room&&<div className="room-code">ROOM <b>{room.code}</b><button onClick={async()=>{await navigator.clipboard.writeText(url);setCopied(true);setTimeout(()=>setCopied(false),1800)}}>{copied?'COPIED!':'COPY LINK'}</button></div>}</header>
-  {!room?<Landing joining={!!code}><div className="join-card"><label>Dost kya bulate hain?<input maxLength={20} value={name} onChange={e=>setName(e.target.value)} placeholder="Jaise: Chintu, Gudiya, Bunty"/></label><div className="color-label">Pick your colour</div><div className="swatches">{colors.map(c=><button aria-label={`Choose ${c}`} className={c===color?'selected':''} style={{background:c}} onClick={()=>setColor(c)} key={c}/>)}</div><fieldset className="play-mode"><legend>Kiske saath kheloge?</legend><div>{[[0,"Doston ke saath"],[2,"2 computer friends"],[3,"3 computer friends"]].map(([value,label])=><button key={value} type="button" aria-pressed={bots===value} onClick={()=>setBots(Number(value))}>{label}</button>)}</div><p>{bots?"Akele shuru karo. Computer friends khud khelenge; dost bhi room join kar sakte hain.":"Room banao aur link apne doston ko bhejo."}</p></fieldset><div className="join-actions"><button className="primary" onClick={()=>enter('create')} disabled={busy||!name.trim()}>{bots?"COMPUTER KE SAATH KHELO":"ADDA BANAO"} <span>↗</span></button><div className="join-inline"><input value={code} onChange={e=>setCode(e.target.value)} placeholder="ROOM CODE" maxLength={6}/><button onClick={()=>enter('join')} disabled={busy||!name.trim()||!code.trim()}>AA JAO →</button></div></div><label className="dev" hidden={bots>0}><input type="checkbox" checked={dev} onChange={e=>setDev(e.target.checked)}/> Practice with 2–4 friends <span>(full game: 5–8 players)</span></label></div></Landing>
-  :<main className="game-layout"><section className="game-panel"><div className="scene-overlay"><span className="phase-chip">{room.phase.toUpperCase()}</span><strong>{room.message}</strong></div><Scene room={room} id={playerId}/><RoundGuide room={room} id={playerId} identity={identity}/></section><aside className="sidebar"><div className="side-heading"><span>THE COURTYARD</span><h2>{room.phase==='lobby'?'Gather the gang':room.phase==='chase'?'Run, run, run!':room.phase==='caught'?'Caught!':'The game is on'}</h2><p>{room.phase==='lobby'?`Everyone ready? ${room.minPlayers} players needed to start.`:room.phase==='identity'?'Your choice is yours alone. The DENNER cannot see it.':room.phase==='guessing'?'DENNER walks up to a friend and guesses their secret.':room.phase==='chase'?'Only the DENNER and runner can move.':room.message}</p></div><div className="player-list"><div className="section-title">PLAYERS <span>{room.players.length}/8</span></div>{room.players.map(p=><div key={p.id} className={`player-row ${p.connected?'':'offline'}`}><span className="player-dot" style={{background:p.color}}/><span>{p.name}{p.bot?' · computer':p.id===playerId?' (you)':''}</span><small>{!p.connected?'RECONNECTING':room.phase==='lobby'?(p.ready?'READY':'WAITING'):p.role==='denner'?'DENNER':p.role==='runner'?'RUNNER':'PLAYER'}</small></div>)}</div>
-  {room.phase==='lobby'&&<button className="primary wide" onClick={()=>act('ready',!me?.ready)}>{me?.ready?'CANCEL READY':'I’M READY'} <span>✦</span></button>}
-  {room.phase==='category'&&isDenner&&<div className="action-box"><div className="section-title">CHOOSE A CATEGORY</div>{Object.keys(CATEGORIES).map(c=><button className="option" key={c} onClick={()=>act('category',c as Category)}>{c} <span>→</span></button>)}</div>}
-  {room.phase==='identity'&&!isDenner&&<div className="action-box"><div className="section-title">YOUR SECRET {room.category?.toUpperCase()}</div>{identity?<p className="chosen">You chose <b>{identity}</b>. Keep it secret!</p>:(room.category?CATEGORIES[room.category]:[]).map(v=><button className="option" key={v} onClick={()=>act('identity',v)}>{v}<span>→</span></button>)}</div>}
-  {room.phase==='identity'&&isDenner&&<p className="note">Waiting for the others to choose...</p>}
-  {room.phase==='guessing'&&isDenner&&<div className="action-box"><div className="section-title">NEARBY PLAYERS</div>{nearby.length?nearby.map(p=><button key={p.id} className="option" onClick={()=>setGuessTarget(p.id)}>Knock knock · {p.name}<span>→</span></button>):<p className="note">Kisi dost ke paas jaao, phir knock karo.</p>}</div>}
-  {room.phase==='chase'&&<div className="chase-note">{isDenner?'CHASE THE RUNNER!':playerId===room.runnerId?'ESCAPE THE DENNER!':'WATCH THE CHASE!'}</div>}
-  <div className="side-bottom">WASD / ARROWS TO MOVE · SHIFT TO SPRINT<br/>Made for friends, shared screens, and old streets.</div></aside></main>}
+
+ return <div className={`app ${room?'in-game':''} ${room?.phase==='caught'?'caught-flash':''}`} aria-busy={busy}>
+  <header>
+   <div className="brand"><span className="brand-icon">❋</span><div><strong>CHICKLETS</strong><small>बचपन वाला knock knock</small></div></div>
+   <span className="top-note">A LITTLE GAME FROM THE MOHALLA</span>
+   {room&&<div className="room-code">ROOM <b>{room.code}</b><button onClick={async()=>{await navigator.clipboard.writeText(url);setCopied(true);setTimeout(()=>setCopied(false),1800)}}>{copied?'COPIED!':'COPY LINK'}</button></div>}
+  </header>
+  {!room?<Landing joining={!!code}>
+   <div className="join-card">
+    <label>Dost kya bulate hain?<input maxLength={20} value={name} onChange={e=>setName(e.target.value)} placeholder="Jaise: Chintu, Gudiya, Bunty"/></label>
+    <div className="color-label">Pick your colour</div>
+    <div className="swatches">{colors.map(c=><button aria-label={`Choose ${c}`} className={c===color?'selected':''} style={{background:c}} onClick={()=>setColor(c)} key={c}/>)}</div>
+    <fieldset className="play-mode">
+     <legend>Kiske saath kheloge?</legend>
+     <div>{[[0,"Doston ke saath"],[2,"2 computer friends"],[3,"3 computer friends"]].map(([value,label])=><button key={value} type="button" aria-pressed={bots===value} onClick={()=>setBots(Number(value))}>{label}</button>)}</div>
+     <p>{bots?"Akele shuru karo. Computer friends khud khelenge; dost bhi room join kar sakte hain.":"Room banao aur link apne doston ko bhejo."}</p>
+    </fieldset>
+    <div className="join-actions">
+     <button className="primary" onClick={()=>enter('create')} disabled={busy||!name.trim()}>{bots?"COMPUTER KE SAATH KHELO":"ADDA BANAO"} <span>↗</span></button>
+     <div className="join-inline"><input value={code} onChange={e=>setCode(e.target.value)} placeholder="ROOM CODE" maxLength={6}/><button onClick={()=>enter('join')} disabled={busy||!name.trim()||!code.trim()}>AA JAO →</button></div>
+    </div>
+    <label className="dev" hidden={bots>0}><input type="checkbox" checked={dev} onChange={e=>setDev(e.target.checked)}/> Practice with 2–4 friends <span>(full game: 5–8 players)</span></label>
+   </div>
+  </Landing>
+  :<main className="game-layout">
+   <section className="game-panel">
+    <div className="scene-overlay"><span className="phase-chip">{room.phase.toUpperCase()}</span><strong>{room.message}</strong></div>
+    <Scene room={room} id={playerId}/>
+    <RoundGuide room={room} id={playerId} identity={identity}/>
+   </section>
+   <aside className="sidebar">
+    <div className="side-heading">
+     <span>THE COURTYARD</span>
+     <h2>{room.phase==='lobby'?'Gather the gang':room.phase==='chase'?'Run, run, run!':room.phase==='caught'?'Caught!':'The game is on'}</h2>
+     <p>{room.phase==='lobby'?`Everyone ready? ${room.minPlayers} players needed to start.`:room.phase==='identity'?'Your choice is yours alone. The DENNER cannot see it.':room.phase==='guessing'?'DENNER walks up to a friend and guesses their secret.':room.phase==='chase'?'Only the DENNER and runner can move.':room.message}</p>
+    </div>
+    <div className="player-list">
+     <div className="section-title">PLAYERS <span>{room.players.length}/8</span></div>
+     {room.players.map(p=><div key={p.id} className={`player-row ${p.connected?'':'offline'}`}><span className="player-dot" style={{background:p.color}}/><span>{p.name}{p.bot?' · computer':p.id===playerId?' (you)':''}</span><small>{!p.connected?'RECONNECTING':room.phase==='lobby'?(p.ready?'READY':'WAITING'):p.role==='denner'?'DENNER':p.role==='runner'?'RUNNER':'PLAYER'}</small></div>)}
+    </div>
+    {room.phase==='lobby'&&<button className="primary wide" onClick={()=>act('ready',!me?.ready)}>{me?.ready?'CANCEL READY':'I’M READY'} <span>✦</span></button>}
+    {room.phase==='category'&&isDenner&&<div className="action-box"><div className="section-title">CHOOSE A CATEGORY</div>{Object.keys(CATEGORIES).map(c=><button className="option" key={c} onClick={()=>act('category',c as Category)}>{c} <span>→</span></button>)}</div>}
+    {room.phase==='identity'&&!isDenner&&<div className="action-box"><div className="section-title">YOUR SECRET {room.category?.toUpperCase()}</div>{identity?<p className="chosen">You chose <b>{identity}</b>. Keep it secret!</p>:(room.category?CATEGORIES[room.category]:[]).map(v=><button className="option" key={v} onClick={()=>act('identity',v)}>{v}<span>→</span></button>)}</div>}
+    {room.phase==='identity'&&isDenner&&<p className="note">Waiting for the others to choose...</p>}
+    {room.phase==='guessing'&&isDenner&&<div className="action-box"><div className="section-title">NEARBY PLAYERS</div>{nearby.length?nearby.map(p=><button key={p.id} className="option" onClick={()=>setGuessTarget(p.id)}>Knock knock · {p.name}<span>→</span></button>):<p className="note">Kisi dost ke paas jaao, phir knock karo.</p>}</div>}
+    {room.phase==='chase'&&<div className="chase-note">{isDenner?'CHASE THE RUNNER!':playerId===room.runnerId?'ESCAPE THE DENNER!':'WATCH THE CHASE!'}</div>}
+    <div className="side-bottom">WASD / ARROWS TO MOVE · SHIFT TO SPRINT<br/>Made for friends, shared screens, and old streets.</div>
+   </aside>
+  </main>}
   {room&&<KnockPlay room={room} id={playerId} identity={identity} act={act}/>}
   {error&&<div className="toast" role="alert">{error}<button onClick={()=>setError('')}>×</button></div>}
   {guessTarget&&room?.category&&<div className="modal-shade" onClick={()=>setGuessTarget(null)}><div className="modal" onClick={e=>e.stopPropagation()}><button className="close" onClick={()=>setGuessTarget(null)}>×</button><p className="eyebrow">PEETH PAR KNOCK KARO</p><h2>Kya tum…?</h2><p>{room.players.find(p=>p.id===guessTarget)?.name} se kaunsa naam poochhna hai?</p><div className="guess-grid">{CATEGORIES[room.category].map(v=><button key={v} onClick={()=>act('guess',{targetId:guessTarget,identity:v})}>{v}</button>)}</div></div></div>}
