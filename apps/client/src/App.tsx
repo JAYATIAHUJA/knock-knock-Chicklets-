@@ -6,6 +6,8 @@ import {Scene} from './scene';
 import {RoundGuide} from './RoundGuide';
 import {KnockPlay} from './KnockPlay';
 import {Landing} from './Landing';
+import {RoleReveal} from './RoleReveal';
+import {RoundRecap} from './RoundRecap';
 import {sounds} from './sound';
 
 const colors=['#db7857','#6b9b78','#d4a047','#8296bd','#ae82a6','#79aeb2'];
@@ -20,7 +22,23 @@ export default function App(){
  const [guessTarget,setGuessTarget]=useState<string|null>(null);
  const [copied,setCopied]=useState(false);
  const [busy,setBusy]=useState(false);
+
+ // Role reveal state
+ const [showReveal,setShowReveal]=useState(false);
+ const revealShownForRound=useRef('');  // prevent double-firing
+
+ // Round recap state
+ const [recap,setRecap]=useState<null|{
+  runnerName:string;dennerName:string;newDennerName:string;
+  survivalMs:number;relayCount:number;catchReason:string;
+ }>(null);
+
+ // Track phase & chase data for recap
  const lastPhase=useRef<string>('');
+ const chaseData=useRef({
+  runnerId:'',dennerName:'',runnerName:'',
+  startedAt:0,relayCount:0,
+ });
 
  const me=room?.players.find(p=>p.id===playerId);
  const isDenner=playerId===room?.dennerId;
@@ -28,13 +46,60 @@ export default function App(){
 
  useEffect(()=>{
   if(!room)return;
-  if(room.phase==='chase'&&lastPhase.current!=='chase'){
-   sounds.playChaseAlert();
-  }else if(room.phase==='caught'&&lastPhase.current!=='caught'){
-   sounds.playTagImpact();
+  const prev=lastPhase.current;
+  const curr=room.phase;
+  if(curr===prev)return;
+
+  // ── CATEGORY: Among Us role reveal ─────────────────────────
+  if(curr==='category'){
+   const roundKey=room.dennerId??'';
+   if(revealShownForRound.current!==roundKey){
+    revealShownForRound.current=roundKey;
+    setShowReveal(true);
+    setRecap(null); // clear old recap
+   }
   }
-  lastPhase.current=room.phase;
- },[room?.phase]);
+
+  // ── CHASE: start tracking survival time ───────────────────
+  if(curr==='chase'&&prev!=='chase'){
+   const denner=room.players.find(p=>p.id===room.dennerId);
+   const runner=room.players.find(p=>p.id===room.runnerId);
+   chaseData.current={
+    runnerId:room.runnerId??'',
+    dennerName:denner?.name??'?',
+    runnerName:runner?.name??'?',
+    startedAt:Date.now(),
+    relayCount:0,
+   };
+   sounds.playChaseAlert();
+  }
+
+  // Count relay transfers during chase
+  if(curr==='chase'&&prev==='chase'&&room.runnerId&&room.runnerId!==chaseData.current.runnerId){
+   chaseData.current.relayCount++;
+   chaseData.current.runnerId=room.runnerId;
+   chaseData.current.runnerName=room.players.find(p=>p.id===room.runnerId)?.name??chaseData.current.runnerName;
+  }
+
+  // ── CAUGHT: show round recap ────────────────────────────
+  if(curr==='caught'&&prev!=='caught'){
+   sounds.playTagImpact();
+   sounds.playRecapStinger();
+   const survivedMs=chaseData.current.startedAt>0?Date.now()-chaseData.current.startedAt:0;
+   const newDenner=room.players.find(p=>p.id===room.dennerId);
+   setRecap({
+    runnerName:chaseData.current.runnerName||'Runner',
+    dennerName:chaseData.current.dennerName||'Denner',
+    newDennerName:newDenner?.name??'?',
+    survivalMs:survivedMs,
+    relayCount:chaseData.current.relayCount,
+    catchReason:room.message,
+   });
+   chaseData.current.startedAt=0;
+  }
+
+  lastPhase.current=curr;
+ },[room?.phase,room?.runnerId,room?.dennerId,room?.message]);
 
  useEffect(()=>{const fn=()=>setError('Connection lost. Reconnecting…');socket.on('disconnect',fn);return()=>{socket.off('disconnect',fn)}},[setError]);
 
@@ -45,24 +110,14 @@ export default function App(){
    localStorage.setItem('chicklets-name',name);
    const session=await send(kind,kind==='create'?{name,color,dev,bots}:{name,color,code:code.trim().toUpperCase()}) as {code:string;token:string;playerId:string};
    saveSession(session);
-   if(kind==='create'){
-    history.replaceState(null,'',`?room=${session.code}`);
-    setCode(session.code);
-   }
-  }catch(e){
-   setError(e instanceof Error?e.message:String(e));
-  }
+   if(kind==='create'){history.replaceState(null,'',`?room=${session.code}`);setCode(session.code)}
+  }catch(e){setError(e instanceof Error?e.message:String(e))}
   setBusy(false);
  }
 
  async function act(event:string,value:unknown){
-  try{
-   setError('');
-   await send(event,value);
-   if(event==='guess')setGuessTarget(null);
-  }catch(e){
-   setError(e instanceof Error?e.message:String(e));
-  }
+  try{setError('');await send(event,value);if(event==='guess')setGuessTarget(null)}
+  catch(e){setError(e instanceof Error?e.message:String(e))}
  }
 
  const url=room?`${location.origin}?room=${room.code}`:'';
@@ -73,6 +128,7 @@ export default function App(){
    <span className="top-note">A LITTLE GAME FROM THE MOHALLA</span>
    {room&&<div className="room-code">ROOM <b>{room.code}</b><button onClick={async()=>{await navigator.clipboard.writeText(url);setCopied(true);setTimeout(()=>setCopied(false),1800)}}>{copied?'COPIED!':'COPY LINK'}</button></div>}
   </header>
+
   {!room?<Landing joining={!!code}>
    <div className="join-card">
     <label>Dost kya bulate hain?<input maxLength={20} value={name} onChange={e=>setName(e.target.value)} placeholder="Jaise: Chintu, Gudiya, Bunty"/></label>
@@ -90,6 +146,7 @@ export default function App(){
     <label className="dev" hidden={bots>0}><input type="checkbox" checked={dev} onChange={e=>setDev(e.target.checked)}/> Practice with 2–4 friends <span>(full game: 5–8 players)</span></label>
    </div>
   </Landing>
+
   :<main className="game-layout">
    <section className="game-panel">
     <div className="scene-overlay"><span className="phase-chip">{room.phase.toUpperCase()}</span><strong>{room.message}</strong></div>
@@ -106,7 +163,7 @@ export default function App(){
      <div className="section-title">PLAYERS <span>{room.players.length}/8</span></div>
      {room.players.map(p=><div key={p.id} className={`player-row ${p.connected?'':'offline'}`}><span className="player-dot" style={{background:p.color}}/><span>{p.name}{p.bot?' · computer':p.id===playerId?' (you)':''}</span><small>{!p.connected?'RECONNECTING':room.phase==='lobby'?(p.ready?'READY':'WAITING'):p.role==='denner'?'DENNER':p.role==='runner'?'RUNNER':'PLAYER'}</small></div>)}
     </div>
-    {room.phase==='lobby'&&<button className="primary wide" onClick={()=>act('ready',!me?.ready)}>{me?.ready?'CANCEL READY':'I’M READY'} <span>✦</span></button>}
+    {room.phase==='lobby'&&<button className="primary wide" onClick={()=>act('ready',!me?.ready)}>{me?.ready?'CANCEL READY':'I\'M READY'} <span>✦</span></button>}
     {room.phase==='category'&&isDenner&&<div className="action-box"><div className="section-title">CHOOSE A CATEGORY</div>{Object.keys(CATEGORIES).map(c=><button className="option" key={c} onClick={()=>act('category',c as Category)}>{c} <span>→</span></button>)}</div>}
     {room.phase==='identity'&&!isDenner&&<div className="action-box"><div className="section-title">YOUR SECRET {room.category?.toUpperCase()}</div>{identity?<p className="chosen">You chose <b>{identity}</b>. Keep it secret!</p>:(room.category?CATEGORIES[room.category]:[]).map(v=><button className="option" key={v} onClick={()=>act('identity',v)}>{v}<span>→</span></button>)}</div>}
     {room.phase==='identity'&&isDenner&&<p className="note">Waiting for the others to choose...</p>}
@@ -115,7 +172,20 @@ export default function App(){
     <div className="side-bottom">WASD / ARROWS TO MOVE · SHIFT TO SPRINT<br/>Made for friends, shared screens, and old streets.</div>
    </aside>
   </main>}
+
   {room&&<KnockPlay room={room} id={playerId} identity={identity} act={act}/>}
+
+  {/* Among Us-style role reveal */}
+  {room&&showReveal&&me&&<RoleReveal
+   isDenner={isDenner}
+   playerColor={me.color}
+   playerName={me.name}
+   onDone={()=>setShowReveal(false)}
+  />}
+
+  {/* Round recap */}
+  {room&&recap&&room.phase==='caught'&&<RoundRecap {...recap}/>}
+
   {error&&<div className="toast" role="alert">{error}<button onClick={()=>setError('')}>×</button></div>}
   {guessTarget&&room?.category&&<div className="modal-shade" onClick={()=>setGuessTarget(null)}><div className="modal" onClick={e=>e.stopPropagation()}><button className="close" onClick={()=>setGuessTarget(null)}>×</button><p className="eyebrow">PEETH PAR KNOCK KARO</p><h2>Kya tum…?</h2><p>{room.players.find(p=>p.id===guessTarget)?.name} se kaunsa naam poochhna hai?</p><div className="guess-grid">{CATEGORIES[room.category].map(v=><button key={v} onClick={()=>act('guess',{targetId:guessTarget,identity:v})}>{v}</button>)}</div></div></div>}
  </div>

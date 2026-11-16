@@ -132,6 +132,63 @@ class SoundManager {
     osc.start(now);
     osc.stop(now + 0.045);
   }
+
+  // Among Us-style role reveal sting
+  playRoleReveal(isDenner: boolean) {
+    this.init();
+    if (!this.ctx || this.isMuted) return;
+    const now = this.ctx.currentTime;
+
+    if (isDenner) {
+      // Dramatic villain sting: low → high → resolve
+      const notes = [110, 146.8, 185, 246.9, 220];
+      notes.forEach((freq, i) => {
+        const osc = this.ctx!.createOscillator();
+        const gain = this.ctx!.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now + i * 0.11);
+        gain.gain.setValueAtTime(0, now + i * 0.11);
+        gain.gain.linearRampToValueAtTime(0.28, now + i * 0.11 + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.11 + 0.18);
+        osc.connect(gain); gain.connect(this.ctx!.destination);
+        osc.start(now + i * 0.11);
+        osc.stop(now + i * 0.11 + 0.2);
+      });
+    } else {
+      // Cheerful crew sting: ascending arpeggio
+      const notes = [261.6, 329.6, 392, 523.3];
+      notes.forEach((freq, i) => {
+        const osc = this.ctx!.createOscillator();
+        const gain = this.ctx!.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + i * 0.09);
+        gain.gain.setValueAtTime(0, now + i * 0.09);
+        gain.gain.linearRampToValueAtTime(0.22, now + i * 0.09 + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.09 + 0.2);
+        osc.connect(gain); gain.connect(this.ctx!.destination);
+        osc.start(now + i * 0.09);
+        osc.stop(now + i * 0.09 + 0.22);
+      });
+    }
+  }
+
+  // Round recap stinger
+  playRecapStinger() {
+    this.init();
+    if (!this.ctx || this.isMuted) return;
+    const now = this.ctx.currentTime;
+    [392, 349.2, 311.1, 261.6].forEach((freq, i) => {
+      const osc = this.ctx!.createOscillator();
+      const gain = this.ctx!.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + i * 0.13);
+      gain.gain.setValueAtTime(0.25, now + i * 0.13);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.13 + 0.18);
+      osc.connect(gain); gain.connect(this.ctx!.destination);
+      osc.start(now + i * 0.13);
+      osc.stop(now + i * 0.13 + 0.19);
+    });
+  }
 }
 
 export const sounds = new SoundManager();
