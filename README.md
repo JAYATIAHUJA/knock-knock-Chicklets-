@@ -33,3 +33,13 @@ For deployment, serve `apps/client/dist` as static files and start the server wi
 
 ### Computer friends
 Choose **2 computer friends** or **3 computer friends** on the start screen, create the room, then press Ready. Bots pick names, knock and reply, chase and flee, and attempt relays. They are server-controlled rule-based opponents, clearly marked in the roster. Bot DENNER guesses do not read human secrets; uncertain relay calls can make bots out. Bots currently select Cars as DENNER. Friends may join a bot room while it is in the lobby. Rooms are removed once the last human session expires.
+
+---
+
+## 📚 Documentation & Contributing
+
+- 📖 [Contributing Guide](CONTRIBUTING.md): Setup, workflow, PR conventions, and guidelines.
+- 🤖 [Agents Guide (AGENTS.md)](AGENTS.md): Architecture principles and operational rules for AI coding assistants.
+- 🎨 [Game & Design Philosophy (DESIGN.md)](DESIGN.md): Aesthetic mood, 3D courtyard vision, and state diagrams.
+- 📄 [License](LICENSE): MIT License.
+
