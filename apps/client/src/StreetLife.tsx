@@ -19,11 +19,11 @@ function HindiBoard({at,title,subtitle,color,width=6}:{at:[number,number,number]
 
 function ShopGoods(){
  return <>
-  <HindiBoard at={[-18,4,-21.93]} title="भारत इलेक्ट्रॉनिक्स" subtitle="टी.वी. • रेडियो • पंखे की मरम्मत" color="#ad302e"/>
-  <HindiBoard at={[-9,4,-21.93]} title="शर्मा जनरल स्टोर" subtitle="टॉफी • बिस्कुट • ठंडा • रिचार्ज" color="#157a80"/>
-  <HindiBoard at={[9,4,-21.93]} title="ताज़े फल और सब्ज़ी" subtitle="आज का ताज़ा माल • सही दाम" color="#8b4427"/>
-  <HindiBoard at={[0,4,-21.93]} title="अपना मोहल्ला" subtitle="शाम हुई? खेलने आ जाओ!" color="#375e49"/>
-  <HindiBoard at={[18,4,-21.93]} title="राजू चाय भंडार" subtitle="गरम चाय • समोसा • नमकीन" color="#a94831"/>
+  <HindiBoard at={[-18,4,-21.93]} title="Bharat Electronics" subtitle="TV • RADIO • FAN REPAIRS" color="#ad302e"/>
+  <HindiBoard at={[-9,4,-21.93]} title="Sharma General Store" subtitle="CANDY • BISCUITS • COLD DRINKS" color="#157a80"/>
+  <HindiBoard at={[9,4,-21.93]} title="Fruit Market" subtitle="FRESH PRODUCE DAILY" color="#8b4427"/>
+  <HindiBoard at={[0,4,-21.93]} title="Lane Four" subtitle="COURTYARD GAMES" color="#375e49"/>
+  <HindiBoard at={[18,4,-21.93]} title="Raju’s Tea Stall" subtitle="HOT TEA • SNACKS" color="#a94831"/>
   {/* Stocked wooden shelves break up the dark, empty shop openings. */}
   {[-9,0].map((x,shop)=><group key={x} position={[x,0,-22.1]}>
    {[1.1,1.8,2.5].map((y,row)=><group key={y}>

@@ -19,25 +19,26 @@
   position: fixed;
   inset: 0;
   z-index: 999;
-  background: #14211a;
+  background: #191f1a;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transition: opacity 0.7s ease, transform 0.7s ease, visibility 0.7s;
+  isolation: isolate;
+  transition: opacity .48s ease, visibility .48s;
 }
 
-.intro-curtain.curtain-dissolve {
+.intro-curtain.intro-exit {
   opacity: 0;
   pointer-events: none;
-  transform: scale(1.04);
 }
 
 .curtain-vignette {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.85) 90%);
+  z-index: 6;
+  background: radial-gradient(circle at 50% 46%, transparent 20%, rgba(4,9,6,.72) 100%);
   pointer-events: none;
 }
 
@@ -47,38 +48,48 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 2;
+  z-index: 5;
+  width: min(92vw, 900px);
+  min-height: 520px;
 }
+
+.intro-door{position:absolute;inset-block:0;width:50.2%;z-index:2;background-color:#254335;background-image:linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:34px 34px;border-color:#d59a38;transition:transform .9s cubic-bezier(.72,0,.18,1);box-shadow:inset 0 0 80px #0b160f99}
+.intro-door:before{content:'';position:absolute;inset:20px;border:1px solid #d6aa5938;background:repeating-linear-gradient(45deg,transparent 0 18px,#e7b64710 18px 20px)}
+.intro-door span{position:absolute;top:30px;color:#f0c85d;font:600 13px/1 'Anek Devanagari',sans-serif;letter-spacing:.09em}
+.door-left{left:0;border-right:1px solid #d59a38}.door-left span{left:36px}.door-right{right:0;border-left:1px solid #d59a38}.door-right span{right:36px}
+.intro-reveal .door-left,.intro-exit .door-left{transform:translateX(-101%)}
+.intro-reveal .door-right,.intro-exit .door-right{transform:translateX(101%)}
 
 /* Knock text effects */
 .knock-fx {
   position: absolute;
-  top: -80px;
+  inset:0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .knock-word {
-  font-family: 'Yatra One', 'Baloo 2', cursive;
-  font-size: clamp(52px, 8vw, 90px);
-  color: #f7ce46;
-  text-shadow: 0 0 25px rgba(247, 206, 70, 0.6), 4px 4px 0 #8b2c14;
-  animation: knock-word-pop 0.35s ease-out;
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;
+  font:700 clamp(48px,8vw,94px)/1 'Anek Devanagari','Yatra One',sans-serif;
+  color:#f4c64f;text-shadow:4px 5px 0 #7c281b;
 }
+.knock-word i{font-style:normal;opacity:0;transform:scale(.65) rotate(-8deg)}
+.knock1 .knock-word i:first-child{animation:knock-word-pop .42s cubic-bezier(.2,.9,.25,1.3) forwards}
+.knock2 .knock-word i{animation:knock-word-pop .42s cubic-bezier(.2,.9,.25,1.3) forwards}
+.knock2 .knock-word i:first-child{opacity:.45;transform:scale(.86) rotate(-5deg)}
+.reveal .knock-word{opacity:0;transition:opacity .2s}
 
 @keyframes knock-word-pop {
   0% { transform: scale(0.6) rotate(-8deg); opacity: 0; }
-  60% { transform: scale(1.15) rotate(4deg); opacity: 1; }
+  60% { transform: scale(1.18) rotate(3deg); opacity: 1; }
   100% { transform: scale(1) rotate(0); }
 }
 
 /* Shockwave rings on impact */
 .knock-wave-ring {
   position: absolute;
-  width: 140px;
-  height: 140px;
-  border: 3px solid #f7ce46;
+  width:120px;height:120px;border:2px solid #f7ce46;
   border-radius: 50%;
   animation: ring-pulse 0.7s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
 }
@@ -96,10 +107,13 @@
 .intro-hand {
   width: clamp(220px, 32vw, 360px);
   height: clamp(260px, 38vw, 420px);
-  margin-top: 20px;
+  margin-top:20px;
   filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6));
-  animation: hand-strike 0.65s cubic-bezier(0.2, 0.9, 0.3, 1) infinite alternate;
+  transform-origin:60% 30%;
 }
+.intro-hand.knock1{animation:hand-knock .58s cubic-bezier(.22,.8,.2,1) both}
+.intro-hand.knock2{animation:hand-knock .58s cubic-bezier(.22,.8,.2,1) both}
+.intro-hand.reveal{animation:hand-leave .5s ease-in forwards}
 
 .intro-hand img {
   width: 100%;
@@ -107,41 +121,38 @@
   object-fit: contain;
 }
 
-@keyframes hand-strike {
-  0% { transform: translateY(20px) rotate(-8deg) scale(0.96); }
-  50% { transform: translateY(-15px) rotate(2deg) scale(1.04); }
-  100% { transform: translateY(0) rotate(-2deg) scale(1); }
-}
+@keyframes hand-knock{0%{transform:translate3d(0,32px,0) rotate(-10deg) scale(.93)}55%{transform:translate3d(0,-18px,0) rotate(3deg) scale(1.03)}72%{transform:translate3d(0,-5px,0) rotate(-1deg)}100%{transform:translate3d(0,0,0) rotate(-3deg)}}
+@keyframes hand-leave{to{opacity:0;transform:translate3d(70px,80px,0) rotate(12deg) scale(.82)}}
+
+.intro-title-lockup{position:absolute;display:grid;justify-items:center;opacity:0;transform:scale(.84);filter:blur(10px)}
+.intro-reveal .intro-title-lockup{animation:title-arrive .72s .36s cubic-bezier(.16,1,.3,1) forwards}
+.intro-overline{font:800 12px/1 'DM Sans',sans-serif;letter-spacing:.42em;color:#f0c85d;margin-left:.42em}
+.intro-title-lockup strong{font:400 clamp(68px,12vw,150px)/.82 'Lilita One','Baloo 2',sans-serif;letter-spacing:-.035em;color:#fff0c8;text-shadow:0 5px 0 #9f3723,0 11px 28px #0008}
+.intro-hindi{margin-top:18px;font:600 clamp(15px,2vw,22px)/1 'Anek Devanagari',sans-serif;color:#f1c75d;letter-spacing:.06em}
+@keyframes title-arrive{to{opacity:1;transform:scale(1);filter:blur(0)}}
 
 .intro-tagline {
-  margin-top: 25px;
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: #e5d8be;
-  letter-spacing: 0.05em;
+  position:absolute;bottom:12px;margin:0;font:600 13px/1 'DM Sans',sans-serif;color:#d8c9aa;letter-spacing:.13em;opacity:.8;
 }
+.intro-reveal .intro-tagline{opacity:0;transition:opacity .25s}
 
 .skip-intro-btn {
   position: absolute;
   bottom: 24px;
   right: 24px;
   z-index: 10;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: #fff4d6;
-  padding: 8px 16px;
-  border-radius: 20px;
+  background:transparent;border:0;border-bottom:1px solid #fff5;color:#e8dcc4;padding:8px 2px;border-radius:0;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  backdrop-filter: blur(4px);
-  transition: background 0.2s;
+  transition:color .2s,border-color .2s;
 }
 
 .skip-intro-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
+  color:#f6cd58;border-color:#f6cd58;
 }
+
+@media(prefers-reduced-motion:reduce){.intro-door,.intro-hand,.knock-word i,.knock-wave-ring,.intro-title-lockup{animation:none!important;transition:none!important}.intro-reveal .door-left{transform:translateX(-101%)}.intro-reveal .door-right{transform:translateX(101%)}.intro-reveal .intro-title-lockup{opacity:1;transform:none;filter:none}}
 
 /* ══════════════════════════════════════════════
    2. REAL MOHALLA WEBSITE (Completely Hand-Free!)
@@ -183,16 +194,17 @@
 }
 
 .brand-title {
-  font-family: 'Yatra One', cursive;
+  font-family: 'Lilita One', 'Baloo 2', sans-serif;
   font-size: 26px;
   margin: 0;
   line-height: 1;
   color: #fff9e6;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   text-shadow: 2px 2px 0 #991b1b;
 }
 
 .brand-sub {
+  font-family:'Anek Devanagari','DM Sans',sans-serif;
   font-size: 11px;
   color: #cbd5e1;
   font-weight: 600;
@@ -258,7 +270,8 @@
 }
 
 .poster-headline {
-  font-family: 'Yatra One', cursive;
+  font-family: 'Anek Devanagari','Yatra One',sans-serif;
+  font-weight:800;
   font-size: clamp(28px, 3.2vw, 42px);
   line-height: 1.15;
   color: #1e3a2f;
@@ -338,7 +351,8 @@
 }
 
 .adda-heading {
-  font-family: 'Yatra One', cursive;
+  font-family: 'Anek Devanagari','Yatra One',sans-serif;
+  font-weight:800;
   font-size: 24px;
   color: #1c3228;
   margin: 2px 0 4px 0;
@@ -455,6 +469,10 @@
 
 /* Responsive Scaling for smaller screens */
 @media(max-width: 860px) {
+  .curtain-stage{min-height:430px;width:88vw}
+  .intro-hand{width:210px;height:270px}
+  .intro-title-lockup strong{font-size:clamp(58px,18vw,92px)}
+  .intro-door span{top:20px}.door-left span{left:18px}.door-right span{right:18px}
   .real-mohalla-site {
     height: auto;
     min-height: 100svh;
@@ -482,3 +500,32 @@
     font-size: 9px;
   }
 }
+
+/* Pixel-mohalla surfaces */
+.gali-demo{position:relative;isolation:isolate;overflow:hidden;min-height:240px;border:4px solid #102530;background:#c9894c url('./assets/mohalla-menu.png') center 65%/cover;box-shadow:5px 6px #101f28}
+.gali-dialogue{position:absolute;z-index:2;top:15px;left:4%;max-width:92%;padding:10px 17px;color:#162d34;background:#fff5d6;border:3px solid;box-shadow:4px 4px #162d34;transform:rotate(-3deg)}
+.gali-dialogue small,.gali-dialogue strong{display:block}.gali-dialogue small{font:800 10px/1.4 monospace;letter-spacing:.1em}.gali-dialogue strong,.knock-card h2.gali-question{font:400 clamp(25px,3vw,45px)/1.15 'Lilita One',system-ui}
+.beat-2 .gali-dialogue{left:auto;right:5%;background:#ffcc50;transform:rotate(3deg)}
+.gali-demo button{position:absolute;bottom:10px;right:10px;min-height:44px;padding:0 16px;background:#ffd05c;color:#142631;border:3px solid;font-weight:800;box-shadow:3px 3px #142631}
+.gali-cast{position:absolute;inset:0;pointer-events:none}.gali-kid{--shirt:#ed6945;position:absolute;bottom:38px;left:16%;width:32px;height:35px;background:var(--shirt);border-bottom:8px solid #283b52;box-shadow:-7px 3px var(--shirt),7px 3px var(--shirt);transition:translate .38s ease-out}
+.gali-kid:before{content:'';position:absolute;bottom:100%;left:2px;width:27px;height:23px;background:#ba7950;border-top:9px solid #352522;box-shadow:-4px -3px #352522}.gali-kid:after{content:'';position:absolute;top:100%;width:10px;height:15px;background:#283b52;box-shadow:21px 0 #283b52}.gali-kid span{position:absolute;top:-14px;left:16px;width:4px;height:4px;background:#2c2020;box-shadow:9px 0 #2c2020}
+.gali-kid.chintu{left:37%;--shirt:#159d88}.gali-kid.gudiya{left:68%;--shirt:#e69529}.gudiya:before{box-shadow:-7px 0 #352522,-10px 9px #352522}
+.beat-1 .chintu,.beat-2 .chintu{translate:32px -5px}.beat-2 .gudiya{translate:35px -9px}.beat-2 .denner{translate:42px 0}
+@media(prefers-reduced-motion:reduce){.gali-kid{transition:none}}
+.landing-root,.landing-root .real-mohalla-site{height:auto;min-height:100svh;max-height:none}
+.landing-root .real-mohalla-site{background:#182d36;color:#fff3ce;background-image:radial-gradient(#456069 1px,transparent 1px);background-size:16px 16px}
+.landing-root .site-header{background:#142631;border-color:#73938d}
+.landing-root .hero-viewport{padding-block:clamp(24px,5vh,72px);gap:5vw}
+.arcade-cover{width:100%;position:relative}
+.arcade-cover h2{font:400 clamp(48px,6.5vw,100px)/.92 'Lilita One',system-ui;margin:0 0 -.12em;position:relative;z-index:1;letter-spacing:-.045em;text-shadow:4px 5px #142631;transform:rotate(-3deg)}
+.arcade-cover h2 em{color:#ffc758;font-style:normal}
+.street-strip{height:clamp(145px,23vh,280px);background:#ae8065 url('./assets/mohalla-menu.png') center 55%/cover;border:4px solid #101f28;position:relative;box-shadow:5px 5px #101f28;transform:rotate(-1deg)}
+.street-strip b,.street-strip i{position:absolute;font:700 20px 'Baloo 2',sans-serif;color:#172c34;background:#fff2cd;padding:3px 15px;border:2px solid;border-radius:16px 16px 2px 16px;left:12%;bottom:15%;transform:rotate(-6deg)}
+.street-strip i{left:auto;right:8%;bottom:52%;background:#ffbe47;transform:rotate(8deg)}
+.rulebook{margin-top:22px;font:500 15px/1.55 'DM Sans',sans-serif}.rulebook summary{cursor:pointer;font-weight:700;text-decoration:underline;text-underline-offset:5px;padding:10px 0}.rulebook li{margin:9px 0}.rulebook strong{color:#ffd47a}
+.landing-root .adda-heading{font:400 clamp(32px,4vw,52px)/1 'Lilita One',sans-serif;margin-bottom:20px;color:#203943}
+.landing-root .adda-card{background:#fff3d8;border:4px solid #102530;box-shadow:7px 7px #ef9e47}
+@media(max-width:860px){.landing-root .hero-right{grid-row:2}.landing-root .hero-viewport{gap:22px}.street-strip{height:120px}.arcade-cover h2{font-size:46px}.rulebook{margin-top:8px}}
+.real-mohalla-site,.intro-curtain{image-rendering:pixelated}
+.hero-poster,.adda-card{border-radius:0;box-shadow:8px 8px 0 #1b2b23}
+.f-badge,.badge-btn,.adda-form-container .join-card input:not([type=checkbox]){border-radius:0}

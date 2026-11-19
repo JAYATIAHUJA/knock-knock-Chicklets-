@@ -3,13 +3,13 @@ export type Category = keyof typeof CATEGORIES;
 export type Phase = 'lobby'|'category'|'identity'|'guessing'|'knock'|'chase'|'caught';
 export type Vec = {x:number;z:number};
 export type Input = {seq:number;dx:number;dz:number;sprint:boolean};
-export type Player = {bot?:boolean;id:string;name:string;color:string;ready:boolean;position:Vec;role:'denner'|'runner'|'other';connected:boolean};
+export type Player = {bot?:boolean;id:string;name:string;color:string;ready:boolean;position:Vec;role:'denner'|'runner'|'other';connected:boolean;stamina:number};
 export type Knock = {id:string;dennerId:string;targetId:string;name:string;expiresAt:number};
 export type Speech = {playerId:string;text:string;expiresAt:number};
 export type SafeZone = {id:string;name:string;x:number;z:number;radius:number;capacity:number;expiresAt:number};
 export type BluffSignal = {fromId:string;targetId:string;type:'nod'|'fake'|'whisper';text:string;expiresAt:number};
 export type PublicRoom = {code:string;phase:Phase;category:Category|null;players:Player[];dennerId:string|null;runnerId:string|null;message:string;minPlayers:number;knock:Knock|null;speech:Speech|null;relayDeadline?:number|null;safeZones?:SafeZone[];bluffSignals?:BluffSignal[]};
-export const ARENA = 20, SPEED = 4.5, SPRINT = 1.65, SPECTATOR_SPEED = 2.4, RELAY_LIMIT_MS = 20000, SAFE_ZONE_DURATION_MS = 15000, TICK = 1/60, CATCH_RADIUS = 1.15;
+export const ARENA = 20, SPEED = 4.5, SPRINT = 1.65, SPECTATOR_SPEED = 2.4, RELAY_LIMIT_MS = 20000, SAFE_ZONE_DURATION_MS = 15000, INPUT_TIMEOUT_MS = 250, KNOCK_GRACE_MS = 850, STAMINA_DRAIN_PER_SEC = 42, STAMINA_RECOVER_PER_SEC = 24, TICK = 1/60, CATCH_RADIUS = 1.15;
 export function canMove(phase:Phase,id:string,dennerId:string|null,runnerId:string|null){
   if(phase==='category'||phase==='guessing') return id===dennerId;
   if(phase==='chase') return true; // Denner, Runner, and Spectators all can roam!

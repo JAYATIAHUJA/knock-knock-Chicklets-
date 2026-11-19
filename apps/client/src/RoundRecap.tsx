@@ -22,15 +22,14 @@ export function RoundRecap({runnerName,dennerName,newDennerName,survivalMs,relay
     <div className="round-recap" role="status" aria-label="Round recap">
       <div className="recap-inner">
         <div className="recap-header">
-          <span className="recap-emoji">🏁</span>
-          <h2>Pakde Gaye!</h2>
+          <h2>{newDennerName} out!</h2>
           <p className="recap-reason">{catchReason}</p>
         </div>
 
         <div className="recap-stats">
           <div className="recap-stat">
             <span className="recap-stat-val">{fmt(survivalMs)}</span>
-            <span className="recap-stat-lbl">{runnerName} survived</span>
+            <span className="recap-stat-lbl">Chase time</span>
           </div>
           <div className="recap-stat">
             <span className="recap-stat-val">{relayCount}</span>
@@ -38,7 +37,7 @@ export function RoundRecap({runnerName,dennerName,newDennerName,survivalMs,relay
           </div>
           <div className="recap-stat">
             <span className="recap-stat-val">{dennerName}</span>
-            <span className="recap-stat-lbl">caught them</span>
+            <span className="recap-stat-lbl">Round chaser</span>
           </div>
         </div>
 

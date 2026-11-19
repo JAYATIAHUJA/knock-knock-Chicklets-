@@ -3,6 +3,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Cloud, Clouds, Text, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import {StreetLife} from './StreetLife';
+import {getTextureFilterMode} from './pixel-render';
 
 type V3 = [number, number, number];
 const base = '/textures/';
@@ -17,7 +18,11 @@ function useSurface(name: string, repeat: number) {
     const texture = source.clone();
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(repeat, repeat);
-    texture.anisotropy = 8;
+    const pixel=getTextureFilterMode(i)==='pixel';
+    texture.magFilter = pixel?THREE.NearestFilter:THREE.LinearFilter;
+    texture.minFilter = pixel?THREE.NearestFilter:THREE.LinearMipmapLinearFilter;
+    texture.generateMipmaps = !pixel;
+    texture.anisotropy = 1;
     texture.colorSpace = i === 0 ? THREE.SRGBColorSpace : THREE.NoColorSpace;
     texture.needsUpdate = true;
     return texture;
@@ -155,8 +160,8 @@ export const World = memo(function World() {
     {[-1,1].map(side=><group key={side}><mesh position={[side*20,.035,0]} rotation={[-Math.PI/2,0,0]}><planeGeometry args={[.12,40]}/><meshStandardMaterial color="#e0cba4"/></mesh><mesh position={[0,.035,side*20]} rotation={[-Math.PI/2,0,0]}><planeGeometry args={[40,.12]}/><meshStandardMaterial color="#e0cba4"/></mesh></group>)}
     <StaticArchitecture>
     <StreetLife/>
-    {[-18,-9,0,9,18].map((x,i)=><Building key={`north${i}`} x={x} z={-25} color={['#bc795f','#63aaa4','#c4a77a','#c29b52','#c49d94'][i]} label={[-18,-9,9].includes(x)?'':['','','MOHALLA CHOWK','','RAJU KI DUKAAN'][i]} index={i}/>)}
-    {[-18,-9,0,9,18].map((x,i)=><Building key={`s${i}`} x={x} z={25} rotation={Math.PI} color={i%2?'#aab1a0':'#c3b298'} label="MOHALLA BAZAAR" index={i+2}/>)}
+    {[-18,-9,0,9,18].map((x,i)=><Building key={`north${i}`} x={x} z={-25} color={['#bc795f','#63aaa4','#c4a77a','#c29b52','#c49d94'][i]} label={[-18,-9,9].includes(x)?'':['','','TOWN SQUARE','','RAJU’S STORE'][i]} index={i}/>)}
+    {[-18,-9,0,9,18].map((x,i)=><Building key={`s${i}`} x={x} z={25} rotation={Math.PI} color={i%2?'#aab1a0':'#c3b298'} label="STREET MARKET" index={i+2}/>)}
     {[-12,-3,6,15].map((z,i)=><group key={i}><Building x={-26} z={z} rotation={Math.PI/2} color="#b5ae98" label="DAILY NEEDS" index={i}/><Building x={26} z={z} rotation={-Math.PI/2} color="#c6b397" label="CORNER SHOP" index={i+1}/></group>)}
     {Array.from({length:13},(_,i)=><group key={`distant${i}`}><Block at={[-54+i*9,4+(i%3),-42]} size={[8.8,8+(i%3)*2,7]} color={i%2?'#b3ad99':'#c4b59c'}/><Block at={[-54+i*9,8.2+(i%3)*2,-42]} size={[9,.3,7.3]} color="#8f8f7d"/></group>)}
     </StaticArchitecture>

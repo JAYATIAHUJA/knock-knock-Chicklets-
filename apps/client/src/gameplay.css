@@ -77,6 +77,18 @@
 @media(prefers-reduced-motion:reduce){.knock-card,.knock-tap,.speech-bubble{animation:none}}
 @media(max-width:800px){.knock-card{padding:22px}.knock-card h2{font-size:34px}.knock-tap{font-size:19px}.knock-question{font-size:17px}.shout-panel{top:75px;bottom:auto;width:calc(100% - 20px);padding:12px}.shout-panel h2{font-size:21px}.shout-options button{min-height:44px}.in-game .round-guide h2{font-size:19px}.in-game .brand small{display:none}}
 
+/* Pixel-mohalla presentation: canvas stays low-res, DOM text remains crisp. */
+.oonch-sign{display:block;width:max-content;background:#155e55;color:#fff6c9;border:3px solid #fff6c9;box-shadow:3px 3px #193a35;padding:3px 8px;font:800 15px 'Baloo 2',sans-serif}
+.relay-ticket{margin:12px 0;padding:12px 16px;background:#ffd35a;color:#182b32;border:3px solid #182b32;box-shadow:4px 4px #182b32;overflow-wrap:anywhere}
+.relay-ticket small,.relay-ticket span{display:block;font:700 12px/1.4 'DM Sans',sans-serif}.relay-ticket strong{display:block;font:400 clamp(24px,3vw,38px)/1.12 'Lilita One',sans-serif;margin:3px 0}
+@media(prefers-reduced-motion:no-preference){.relay-ticket{animation:relay-stamp .22s ease-out}@keyframes relay-stamp{from{transform:translateY(5px) rotate(-2deg)}to{transform:none}}}
+.pixel-canvas{image-rendering:pixelated;image-rendering:crisp-edges}
+.pixel-nametag{border-radius:0!important;border:2px solid #362c25!important;box-shadow:3px 3px 0 #362c25!important;letter-spacing:.04em}
+.pixel-bubble{border-radius:0!important;box-shadow:4px 4px 0 #5b402d!important}
+.round-guide,.action-box .option,.chase-note,.knock-card,.modal,.sidebar{border-radius:0!important}
+.knock-card,.modal{box-shadow:8px 8px 0 #362c25!important}
+.primary,.option,.reply-row button,.shout-options button{border-radius:0!important;box-shadow:3px 3px 0 #352b24}
+
 .shout-options kbd{font:700 10px inherit;display:inline-grid;place-items:center;min-width:16px;height:17px;background:#ffffff24;border:1px solid #ffffff40;border-radius:3px;margin-right:3px}.shout-hint{display:block;margin-top:10px;font-size:10px;color:#876749}@media(pointer:coarse){.shout-options kbd{display:none}}
 @media(min-width:801px){.shout-panel{left:auto;right:22px;transform:none;width:300px}.in-game:has(.shout-panel) .sidebar{max-height:calc(100dvh - 440px)}}
 .welcome .welcome-art {

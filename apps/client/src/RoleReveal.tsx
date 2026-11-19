@@ -22,7 +22,7 @@ export function RoleReveal({isDenner,playerColor,playerName,onDone}:Props){
   },[]);
 
   const label   = isDenner ? 'DENNER' : 'KHILADI';
-  const sublabel= isDenner ? 'Tum pakdoge!' : 'Apna secret chhupaao!';
+  const sublabel= isDenner ? 'You’re the chaser.' : 'Keep a straight face.';
   const emoji   = isDenner ? '👑' : '🎭';
   const accent  = isDenner ? '#d44a2a' : '#3a9e72';
 
@@ -43,7 +43,7 @@ export function RoleReveal({isDenner,playerColor,playerName,onDone}:Props){
 
       {/* Text block */}
       <div className="role-text">
-        <div className="role-you">TUM HO...</div>
+        <div className="role-you">YOUR ROLE</div>
         <div className="role-label" style={{color:accent}}>{label}</div>
         <div className="role-sub">{sublabel}</div>
         <div className="role-name" style={{borderColor:accent+'88'}}>

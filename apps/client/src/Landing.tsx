@@ -2,14 +2,14 @@ import {useEffect,useState,type ReactNode} from 'react';
 import './landing.css';
 import {sounds} from './sound';
 
-const PRELOADER_DURATION=2400;
+const PRELOADER_DURATION=3000;
 
 export function Landing({children}:{children:ReactNode}){
  const [loaded,setLoaded]=useState(()=>{
   // Agar user iss session mein pehle dekh chuka hai toh direct site dikhao
   return Boolean(sessionStorage.getItem('chicklets_intro_seen'));
  });
- const [animStep,setAnimStep]=useState<'knock1'|'knock2'|'reveal'|'done'>('knock1');
+ const [animStep,setAnimStep]=useState<'knock1'|'knock2'|'reveal'|'exit'|'done'>('knock1');
 
  useEffect(()=>{
   if(loaded)return;
@@ -19,19 +19,21 @@ export function Landing({children}:{children:ReactNode}){
   const t1=setTimeout(()=>{
     setAnimStep('knock2');
     sounds.playKnock();
-  },700);
+  },620);
 
   const t2=setTimeout(()=>{
     setAnimStep('reveal');
-  },1500);
+  },1250);
 
-  const t3=setTimeout(()=>{
+  const t3=setTimeout(()=>setAnimStep('exit'),2450);
+
+  const t4=setTimeout(()=>{
     setAnimStep('done');
     setLoaded(true);
     sessionStorage.setItem('chicklets_intro_seen','true');
   },PRELOADER_DURATION);
 
-  return ()=>{clearTimeout(t1);clearTimeout(t2);clearTimeout(t3)};
+  return ()=>{clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);clearTimeout(t4)};
  },[loaded]);
 
  function replayIntro(){
@@ -45,21 +47,28 @@ export function Landing({children}:{children:ReactNode}){
       1. INTRO / PRELOADER CURTAIN (Only during animation)
       ══════════════════════════════════════════════ */}
   {!loaded&&(
-   <aside className={`intro-curtain ${animStep==='reveal'?'curtain-dissolve':''}`} aria-label="Game introduction">
+   <aside className={`intro-curtain intro-${animStep}`} aria-label="Game introduction">
     <div className="curtain-vignette"/>
+    <div className="intro-door door-left"><span>LANE 04</span></div>
+    <div className="intro-door door-right"><span>KNOCK HERE</span></div>
     <div className="curtain-stage">
       <div className={`knock-fx ${animStep}`}>
-        <span className="knock-word">ठक! ठक!</span>
+        <span className="knock-word"><i>Knock</i><i>Knock</i></span>
         <div className="knock-wave-ring"/>
         <div className="knock-wave-ring delayed"/>
       </div>
       <div className={`intro-hand ${animStep}`}>
         <img src="/art/knocking-hand.png" alt="Knocking hand" draggable="false"/>
       </div>
-      <p className="intro-tagline">“Knock knock... Kaun hai?”</p>
+      <div className="intro-title-lockup" aria-label="Knock knock Chicklets">
+       <span className="intro-overline">KNOCK · KNOCK</span>
+       <strong>CHICKLETS</strong>
+       <span className="intro-hindi">The neighborhood chase</span>
+      </div>
+      <p className="intro-tagline">Who’s there?</p>
     </div>
     <button className="skip-intro-btn" onClick={()=>{setLoaded(true);sessionStorage.setItem('chicklets_intro_seen','true');}}>
-      Skip Intro ➔
+      Skip intro <span aria-hidden="true">→</span>
     </button>
    </aside>
   )}
@@ -74,7 +83,7 @@ export function Landing({children}:{children:ReactNode}){
      <span className="brand-chakra">❋</span>
      <div>
       <h1 className="brand-title">CHICKLETS</h1>
-      <span className="brand-sub">गली नंबर ०४ · मोहल्ला अड्डा</span>
+      <span className="brand-sub">Lane 04 · Multiplayer courtyard</span>
      </div>
     </div>
     <div className="header-actions">
@@ -88,46 +97,21 @@ export function Landing({children}:{children:ReactNode}){
    <div className="hero-viewport">
     {/* Left Column: Game Lore & Visual Banner */}
     <section className="hero-left">
-     <div className="hero-poster">
-      <div className="poster-pill">★ BACHPAN KI YAADEIN ★</div>
-      <h2 className="poster-headline">Peeth Par Thak-Thak,<br/>Mohalla Mein Bhaag-Daud!</h2>
-      <p className="poster-desc">
-       Apna secret chuno, chor (denner) ko gumrah karo, aur jaise hi pakde jao — <strong>Relay Call</strong> karke dusre dost par shikaar daal do!
-      </p>
-
-      {/* Feature highlights */}
-      <div className="feature-badges">
-       <div className="f-badge">
-        <span className="f-icon">👑</span>
-        <div>
-         <strong>Chor / Denner</strong>
-         <small>Secret pehchaan ke pakdo</small>
-        </div>
-       </div>
-       <div className="f-badge">
-        <span className="f-icon">🎭</span>
-        <div>
-         <strong>Secret Identities</strong>
-         <small>Maruti, BMW, Mango, Tiger</small>
-        </div>
-       </div>
-       <div className="f-badge">
-        <span className="f-icon">📢</span>
-        <div>
-         <strong>Relay Passing</strong>
-         <small>Bhaagte waqt naam pukaro</small>
-        </div>
-       </div>
-      </div>
+     <div className="arcade-cover">
+      <h2>Knock knock.<br/><em>Who’s there?</em></h2>
+      <StreetDemo/>
+      <details className="rulebook"><summary>How to play</summary>
+       <ol><li><strong>Pick a secret.</strong> The Denner picks a category. If it’s cars, each player secretly picks a different car.</li>
+       <li><strong>Call their bluff.</strong> The Denner taps someone and guesses their name. They get a comeback. A correct guess starts the chase.</li>
+       <li><strong>BMW!</strong> Call another secret within 20 seconds and its owner runs next. A wrong call, timeout, tag or boundary crossing puts you out. Everyone else can shelter in marked safe spots.</li></ol>
+      </details>
      </div>
     </section>
 
     {/* Right Column: Adda Creation & Room Join */}
     <section className="hero-right">
      <div className="adda-card">
-      <div className="adda-card-tag">DESI ADDA ENTRY</div>
-      <h3 className="adda-heading">Khel Mein Shamil Ho</h3>
-      <p className="adda-subtitle">Nickname chuno aur turant room shuru karo:</p>
+      <h3 className="adda-heading">You in?</h3>
       
       {/* Form children passed from App.tsx */}
       <div className="adda-form-container">
@@ -138,9 +122,22 @@ export function Landing({children}:{children:ReactNode}){
    </div>
 
    {/* Footer: Authentic Truck-Art Ribbon */}
-   <footer className="site-footer">
-    <span>★ BURI NAZAR WALE TERA MUH KAALA ★ DHEERE CHALNA SAKHT MANA HAI ★ HORN OK PLEASE ★</span>
-   </footer>
   </main>
  </div>;
+}
+
+const beats=[
+ {speaker:'DENNER',line:'“Are you Maruti?”',action:'Knock on Chintu'},
+ {speaker:'CHINTU · MARUTI',line:'“Catch me first.”',action:'Call BMW!'},
+ {speaker:'GUDIYA · BMW',line:'“I was literally just standing here.”',action:'Play it again'}
+] as const;
+
+function StreetDemo(){
+ const [beat,setBeat]=useState(0);
+ const {speaker,line,action}=beats[beat];
+ return <section className={'gali-demo beat-'+beat} aria-label="Try a practice knock">
+  <div className="gali-dialogue" aria-live="polite"><small>{speaker}</small><strong>{line}</strong></div>
+  <div className="gali-cast" aria-hidden="true">{['denner','chintu','gudiya'].map(kid=><span key={kid} className={'gali-kid '+kid}><span/></span>)}</div>
+  <button type="button" onClick={()=>{if(beat===0)sounds.playKnock();setBeat((beat+1)%beats.length)}}>{action} <span aria-hidden="true">↗</span></button>
+ </section>
 }

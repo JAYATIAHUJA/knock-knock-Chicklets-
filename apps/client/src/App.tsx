@@ -48,10 +48,8 @@ export default function App(){
   if(!room)return;
   const prev=lastPhase.current;
   const curr=room.phase;
-  if(curr===prev)return;
-
   // ── CATEGORY: Among Us role reveal ─────────────────────────
-  if(curr==='category'){
+  if(curr==='category' && curr!==prev){
    const roundKey=room.dennerId??'';
    if(revealShownForRound.current!==roundKey){
     revealShownForRound.current=roundKey;
@@ -124,24 +122,24 @@ export default function App(){
 
  return <div className={`app ${room?'in-game':''} ${room?.phase==='caught'?'caught-flash':''}`} aria-busy={busy}>
   <header>
-   <div className="brand"><span className="brand-icon">❋</span><div><strong>CHICKLETS</strong><small>बचपन वाला knock knock</small></div></div>
-   <span className="top-note">A LITTLE GAME FROM THE MOHALLA</span>
+   <div className="brand"><span className="brand-icon">❋</span><div><strong>CHICKLETS</strong><small>The secret-name chase</small></div></div>
+   <span className="top-note">THE NEIGHBORHOOD CHASE</span>
    {room&&<div className="room-code">ROOM <b>{room.code}</b><button onClick={async()=>{await navigator.clipboard.writeText(url);setCopied(true);setTimeout(()=>setCopied(false),1800)}}>{copied?'COPIED!':'COPY LINK'}</button></div>}
   </header>
 
   {!room?<Landing>
    <div className="join-card">
-    <label>Dost kya bulate hain?<input maxLength={20} value={name} onChange={e=>setName(e.target.value)} placeholder="Jaise: Chintu, Gudiya, Bunty"/></label>
+    <label>Your nickname<input maxLength={20} value={name} onChange={e=>setName(e.target.value)} placeholder="e.g. Chintu"/></label>
     <div className="color-label">Pick your colour</div>
     <div className="swatches">{colors.map(c=><button aria-label={`Choose ${c}`} className={c===color?'selected':''} style={{background:c}} onClick={()=>setColor(c)} key={c}/>)}</div>
     <fieldset className="play-mode">
-     <legend>Kiske saath kheloge?</legend>
-     <div>{[[0,"Doston ke saath"],[2,"2 computer friends"],[3,"3 computer friends"]].map(([value,label])=><button key={value} type="button" aria-pressed={bots===value} onClick={()=>setBots(Number(value))}>{label}</button>)}</div>
-     <p>{bots?"Akele shuru karo. Computer friends khud khelenge; dost bhi room join kar sakte hain.":"Room banao aur link apne doston ko bhejo."}</p>
+     <legend>Pick your crew</legend>
+     <div>{[[0,"Friends"],[2,"2 computer friends"],[3,"3 computer friends"]].map(([value,label])=><button key={value} type="button" aria-pressed={bots===value} onClick={()=>setBots(Number(value))}>{label}</button>)}</div>
+     <p>{bots?"Bots are ready. Friends can still join.":"Create a room and send the link to your friends."}</p>
     </fieldset>
     <div className="join-actions">
-     <button className="primary" onClick={()=>enter('create')} disabled={busy||!name.trim()}>{bots?"COMPUTER KE SAATH KHELO":"ADDA BANAO"} <span>↗</span></button>
-     <div className="join-inline"><input value={code} onChange={e=>setCode(e.target.value)} placeholder="ROOM CODE" maxLength={6}/><button onClick={()=>enter('join')} disabled={busy||!name.trim()||!code.trim()}>AA JAO →</button></div>
+     <button className="primary" onClick={()=>enter('create')} disabled={busy||!name.trim()}>{bots?"PLAY WITH BOTS":"CREATE ROOM"} <span>↗</span></button>
+     <div className="join-inline"><input value={code} onChange={e=>setCode(e.target.value)} placeholder="ROOM CODE" maxLength={6}/><button onClick={()=>enter('join')} disabled={busy||!name.trim()||!code.trim()}>JOIN →</button></div>
     </div>
     <label className="dev" hidden={bots>0}><input type="checkbox" checked={dev} onChange={e=>setDev(e.target.checked)}/> Practice with 2–4 friends <span>(full game: 5–8 players)</span></label>
    </div>
@@ -188,8 +186,12 @@ export default function App(){
       )}
     </div>}
     {room.phase==='identity'&&isDenner&&<p className="note">Waiting for the others to choose...</p>}
-    {room.phase==='guessing'&&isDenner&&<div className="action-box"><div className="section-title">NEARBY PLAYERS</div>{nearby.length?nearby.map(p=><button key={p.id} className="option" onClick={()=>setGuessTarget(p.id)}>Knock knock · {p.name}<span>→</span></button>):<p className="note">Kisi dost ke paas jaao, phir knock karo.</p>}</div>}
-    {room.phase==='chase'&&<div className="chase-note">{isDenner?'CHASE THE RUNNER!':playerId===room.runnerId?'ESCAPE THE DENNER!':'WATCH THE CHASE!'}</div>}
+    {room.phase==='guessing'&&isDenner&&<div className="action-box"><div className="section-title">NEARBY PLAYERS</div>{nearby.length?nearby.map(p=><button key={p.id} className="option" onClick={()=>setGuessTarget(p.id)}>Knock knock · {p.name}<span>→</span></button>):<p className="note">Walk up to someone to knock.</p>}</div>}
+    {room.phase==='chase'&&<div key={room.runnerId} className="relay-ticket" role="status">
+      <small>{room.speech?.playerId && room.speech.playerId!==room.runnerId ? room.players.find(p=>p.id===room.speech?.playerId)?.name+' made the call' : 'On the run'}</small>
+      <strong>{playerId===room.runnerId?'You’re up!':room.players.find(p=>p.id===room.runnerId)?.name+' is up!'}</strong>
+      <span>{isDenner?'Tag the runner before the next call.':playerId===room.runnerId?'Call another player’s secret name.':'Find a safe spot. Listen for your name.'}</span>
+    </div>}
     <div className="side-bottom">WASD / ARROWS TO MOVE · SHIFT TO SPRINT<br/>Made for friends, shared screens, and old streets.</div>
    </aside>
   </main>}
@@ -208,6 +210,6 @@ export default function App(){
   {room&&recap&&room.phase==='caught'&&<RoundRecap {...recap}/>}
 
   {error&&<div className="toast" role="alert">{error}<button onClick={()=>setError('')}>×</button></div>}
-  {guessTarget&&room?.category&&<div className="modal-shade" onClick={()=>setGuessTarget(null)}><div className="modal" onClick={e=>e.stopPropagation()}><button className="close" onClick={()=>setGuessTarget(null)}>×</button><p className="eyebrow">PEETH PAR KNOCK KARO</p><h2>Kya tum…?</h2><p>{room.players.find(p=>p.id===guessTarget)?.name} se kaunsa naam poochhna hai?</p><div className="guess-grid">{CATEGORIES[room.category].map(v=><button key={v} onClick={()=>act('guess',{targetId:guessTarget,identity:v})}>{v}</button>)}</div></div></div>}
+  {guessTarget&&room?.category&&<div className="modal-shade" onClick={()=>setGuessTarget(null)}><div className="modal" onClick={e=>e.stopPropagation()}><button className="close" onClick={()=>setGuessTarget(null)}>×</button><p className="eyebrow">MAKE A GUESS</p><h2>Are you…?</h2><p>{room.players.find(p=>p.id===guessTarget)?.name} is listening. Pick your guess.</p><div className="guess-grid">{CATEGORIES[room.category].map(v=><button key={v} onClick={()=>act('guess',{targetId:guessTarget,identity:v})}>{v}</button>)}</div></div></div>}
  </div>
 }

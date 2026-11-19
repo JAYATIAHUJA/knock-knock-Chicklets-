@@ -22,6 +22,7 @@ export class ComputerFriends {
   const steer=(id:string,v:Vec,sprint:boolean)=>{
    const p=g.member(id),len=Math.hypot(v.x,v.z)||1;
    // Feed the same motion integrator as human inputs; never teleport bots.
+   p.lastInputAt=now;
    p.input={seq:++p.lastSeq,dx:v.x/len,dz:v.z/len,sprint};
   };
   if(now>=this.nextMove){
@@ -53,7 +54,7 @@ export class ComputerFriends {
    return;
   }
   if(g.phase==='knock'&&g.pendingKnock&&g.member(g.pendingKnock.targetId).bot){
-   const k=g.pendingKnock;g.replyKnock(k.targetId,k.id,['Pehle toffee do!','Pakad ke dikha!','Arre, phir aa gaye?'][players.findIndex(p=>p.id===k.targetId)%3]);return;
+   const k=g.pendingKnock;g.replyKnock(k.targetId,k.id,['Ask my lawyer.','Catch me first.','You again?'][players.findIndex(p=>p.id===k.targetId)%3]);return;
   }
   if(g.phase==='guessing'&&denner?.bot&&g.category){
    const target=players.filter(p=>p.id!==denner.id&&p.connected).sort((a,b)=>(this.attempts.get(a.id)||0)-(this.attempts.get(b.id)||0))[0];

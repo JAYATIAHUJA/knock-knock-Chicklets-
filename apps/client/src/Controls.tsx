@@ -6,8 +6,8 @@ import {sounds} from './sound';
 export function Controls({room,id}:{room:PublicRoom;id:string}){
  const pressed=useRef(new Set<string>()),touch=useRef(new Set<string>()),seq=useRef(Date.now());
  const allowed=canMove(room.phase,id,room.dennerId,room.runnerId);
- const [stamina,setStamina]=useState(100);
- const staminaRef=useRef(100);
+ const me=room.players.find(p=>p.id===id);
+ const stamina=Math.round(me?.stamina??100);
  const lastStep=useRef(0);
 
  useEffect(()=>{
@@ -23,14 +23,7 @@ export function Controls({room,id}:{room:PublicRoom;id:string}){
    const moving=rawDx!==0||rawDz!==0;
    const wantSprint=keys.has('shift')&&moving;
 
-   // Stamina management: sprint depletes stamina, jog/rest regenerates
-   if(wantSprint&&staminaRef.current>5){
-    staminaRef.current=Math.max(0,staminaRef.current-2.2);
-   }else{
-    staminaRef.current=Math.min(100,staminaRef.current+1.1);
-   }
-   setStamina(Math.round(staminaRef.current));
-   const actualSprint=wantSprint&&staminaRef.current>0;
+   const actualSprint=wantSprint&&stamina>0;
 
    // Footstep SFX when moving
    const now=Date.now();
@@ -43,14 +36,14 @@ export function Controls({room,id}:{room:PublicRoom;id:string}){
   },1000/30);
 
   return()=>{clearInterval(timer);window.removeEventListener('keydown',down);window.removeEventListener('keyup',up);window.removeEventListener('blur',blur)}
- },[allowed]);
+ },[allowed,stamina]);
 
  const button=(key:string,label:string,style?:string)=><button className={`pad-key ${style||''}`} aria-label={label} disabled={!allowed} onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);touch.current.add(key)}} onPointerUp={()=>touch.current.delete(key)} onPointerCancel={()=>touch.current.delete(key)} onLostPointerCapture={()=>touch.current.delete(key)}>{label}</button>;
 
  return <>
   <div className="controls desi-controls">
    <div className="controls-label">{allowed?'WASD / ARROWS to move · SHIFT to sprint':'Movement locked this phase'}</div>
-   {allowed&&<div className="chai-stamina-container" title={`Cutting Chai Stamina: ${stamina}%`}>
+   {allowed&&<div className="chai-stamina-container" title={`Sprint stamina: ${stamina}%`}>
     <div className="chai-glass">
       <div className="chai-liquid" style={{height:`${stamina}%`}}/>
       <div className="chai-stripes"/>
@@ -58,7 +51,7 @@ export function Controls({room,id}:{room:PublicRoom;id:string}){
     </div>
     <div className="chai-meter-wrapper">
       <div className="chai-label-row">
-        <span>CUTTING CHAI POWER</span>
+        <span>SPRINT STAMINA</span>
         <b>{stamina}%</b>
       </div>
       <div className="stamina-track">

@@ -45,27 +45,27 @@ export function KnockPlay({room,id,identity,act}:Props){
   const asker=room.players.find(p=>p.id===knock.dennerId)?.name;
   return <div className={`knock-stage ${addressed||!denner?'addressed':''}`} role={addressed?'dialog':'status'} aria-modal={addressed||undefined} aria-label="Knock knock">
    <div className="knock-card" key={knock.id}>
-    <span className="knock-tap" aria-hidden="true">ठक ठक!</span>
-    <p className="knock-from">{addressed?`${asker} ne tumhari peeth par knock kiya`:denner?`${target} se poochha…`:`${asker} → ${target}`}</p>
-    <h2>Knock knock!</h2><p className="knock-question">“Kya tum <strong>{knock.name}</strong> ho?”</p>
-    {addressed?<><p className="knock-help">Jawab tumhara. Secret ka faisla game karega!</p><div className="banter-options">{['Nahi ji, galat ghar!','Pehle toffee do!','Pakad ke dikha!'].map(text=><button key={text} disabled={busy} onClick={()=>respond(text)}>{text}</button>)}</div>
-      <form onSubmit={event=>{event.preventDefault();void respond(reply)}}><label htmlFor="knock-reply">Apna jawab</label><div className="reply-row"><input id="knock-reply" autoFocus maxLength={120} value={reply} onChange={event=>setReply(event.target.value)} placeholder="Kuch bhi funny bol…"/><button disabled={busy||!reply.trim()} type="submit">Bolo →</button></div></form>
+    <span className="knock-tap" aria-hidden="true">Knock knock!</span>
+    <p className="knock-from">{addressed?`${asker} knocked on your back`:denner?`${target} got your guess…`:`${asker} → ${target}`}</p>
+    <h2 className="gali-question">“Are you {knock.name}?”</h2>
+    {addressed?<><p className="knock-help">Give them a comeback. The game checks the guess.</p><div className="banter-options">{['Wrong address.','Ask my lawyer.','Catch me first.'].map(text=><button key={text} disabled={busy} onClick={()=>respond(text)}>{text}</button>)}</div>
+      <form onSubmit={event=>{event.preventDefault();void respond(reply)}}><label htmlFor="knock-reply">Your comeback</label><div className="reply-row"><input id="knock-reply" autoFocus maxLength={120} value={reply} onChange={event=>setReply(event.target.value)} placeholder="Your version of events…"/><button disabled={busy||!reply.trim()} type="submit">Send →</button></div></form>
      </>:!denner?<div className="bluff-intercept-box">
-      <p className="bluff-title">🕵️‍♂️ Denner ko confuse karo (Social Bluff):</p>
+      <p className="bluff-title">🕵️‍♂️ Throw the Denner off:</p>
       <div className="bluff-options">
-       <button onClick={()=>void act('bluff-signal',{type:'nod'})}>👉 "Haan, wahi hai!"</button>
-       <button onClick={()=>void act('bluff-signal',{type:'fake'})}>🙅 "Nahi, galat banda!"</button>
+       <button onClick={()=>void act('bluff-signal',{type:'nod'})}>👉 "Yep. Absolutely them."</button>
+       <button onClick={()=>void act('bluff-signal',{type:'fake'})}>🙅 "Wild accusation."</button>
       </div>
-      <p className="knock-help">{target} ka jawab aa raha hai…</p>
-     </div>:<p className="knock-help">{target} ka jawab aa raha hai…</p>}
-    <small>{seconds}s · Phir naam check hoga</small>
+      <p className="knock-help">{target} is thinking of a comeback…</p>
+     </div>:<p className="knock-help">{target} is thinking of a comeback…</p>}
+    <small>{seconds}s · until the guess is checked</small>
    </div>
   </div>;
  }
  if(room.phase==='chase'&&room.runnerId===id&&room.category){
   return <section className="shout-panel" aria-label="Call another secret name">
-   <h2>Bhaagte bhaagte, naam pukaaro!</h2><p>{canPass?'Sahi naam → ab woh bhaagega. Galat naam → tum out!':'Abhi sirf tum dono ho. Naam pass karne ke liye ek aur dost chahiye.'}</p>
-   {canPass&&<><div className="shout-options">{callNames.map((name,index)=><button key={name} onPointerDown={event=>event.preventDefault()} onClick={()=>void shout(name)}><kbd>{index+1}</kbd> {name}!</button>)}</div><small className="shout-hint">WASD se bhaago · 1–7 se naam pukaaro · ya button tap karo</small></>}
+   <h2>Pass the chase!</h2><p>{canPass?'Call someone’s secret and they run. Guess wrong and you’re out.':'A relay needs a third player.'}</p>
+   {canPass&&<><div className="shout-options">{callNames.map((name,index)=><button key={name} onPointerDown={event=>event.preventDefault()} onClick={()=>void shout(name)}><kbd>{index+1}</kbd> {name}!</button>)}</div><small className="shout-hint">WASD to run · Press 1–7 or tap a name</small></>}
   </section>;
  }
  return null;
