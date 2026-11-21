@@ -259,7 +259,7 @@ export class Game {
       relayDeadline:this.relayDeadline,
       safeZones:this.safeZones,
       bluffSignals:this.bluffSignals,
-      players:[...this.members.values()].map(({identity,input,velocity,lastSeq,lastInputAt,...p})=>p)
+      players:[...this.members.values()].map(({identity,input,lastInputAt,...p})=>p)
     };
   }
 

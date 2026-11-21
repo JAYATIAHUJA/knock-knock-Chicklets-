@@ -17,7 +17,7 @@ export function Controls({room,id}:{room:PublicRoom;id:string}){
  useEffect(()=>{
   const down=(e:KeyboardEvent)=>{if(['INPUT','SELECT','TEXTAREA'].includes((e.target as HTMLElement)?.tagName))return;pressed.current.add(e.key.toLowerCase());if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(e.key.toLowerCase()))e.preventDefault()};
   const up=(e:KeyboardEvent)=>pressed.current.delete(e.key.toLowerCase());
-  const blur=()=>{pressed.current.clear();touch.current.clear()};
+  const blur=()=>{pressed.current.clear();touch.current.clear();Object.assign(localMotionInput,{dx:0,dz:0,sprint:false})};
   window.addEventListener('keydown',down);window.addEventListener('keyup',up);window.addEventListener('blur',blur);
 
   const timer=setInterval(()=>{
