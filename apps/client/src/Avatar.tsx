@@ -19,8 +19,8 @@ export function Avatar({player,local,speech,chasing}:{chasing:boolean;player:Pla
  velocity.current=next.velocity;
  for(const axis of ['x','z'] as const){
   const authoritative=player.position[axis];
-  const error=next.position[axis]-authoritative;
-  position[axis]=Math.abs(error)>2?authoritative:THREE.MathUtils.clamp(authoritative+error*Math.exp(-14*dt),-ARENA,ARENA);
+  const error=authoritative-next.position[axis];
+  position[axis]=THREE.MathUtils.clamp(Math.abs(error)>2?authoritative:next.position[axis]+error*(1-Math.exp(-3*dt)),-ARENA,ARENA);
  }
  }else{position.x=THREE.MathUtils.damp(position.x,player.position.x,18,dt);position.z=THREE.MathUtils.damp(position.z,player.position.z,18,dt);}const dx=position.x-previous.current.x,dz=position.z-previous.current.z,speed=Math.hypot(dx,dz)/Math.max(dt,.001);blend.current=THREE.MathUtils.damp(blend.current,Math.min(speed/4.5,1),13,dt);if(speed>.12)facing.current=Math.atan2(dx,dz);const turn=Math.atan2(Math.sin(facing.current-root.current.rotation.y),Math.cos(facing.current-root.current.rotation.y));root.current.rotation.y+=turn*(1-Math.exp(-14*dt));phase.current+=dt*(speed>5?12:8.5);const pose=Math.round(Math.sin(phase.current)*4)/4,run=THREE.MathUtils.clamp((speed-4)/3,0,1),swing=pose*(.55+run*.25)*blend.current;legs.current.forEach((p,i)=>{if(p)p.rotation.x=i?-swing:swing});arms.current.forEach((p,i)=>{if(p)p.rotation.x=(i?swing:-swing)*.85});if(body.current)body.current.position.y=Math.round(Math.abs(Math.cos(phase.current))*2)/2*.055*blend.current;previous.current.copy(position)},-1);
  const shirt=player.color;

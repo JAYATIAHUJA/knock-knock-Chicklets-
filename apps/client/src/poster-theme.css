@@ -60,3 +60,32 @@ button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid
 .nearby-knock{position:fixed;z-index:40;top:60%;left:50%;transform:translateX(-50%);padding:14px 22px;background:#ffca16;color:#490b30;border:2px solid #490b30;border-radius:12px!important;box-shadow:0 5px 20px #0003;font-weight:700}
 .nearby-knock kbd{margin-left:12px;font-size:12px}
 @media(max-width:600px){.in-game .round-guide{top:82px!important;width:85vw}.in-game .sidebar{top:190px!important;width:90vw!important;right:5vw!important;max-height:45vh;overflow:auto}.nearby-knock{top:52%;white-space:nowrap}}
+
+html,body,#root{max-width:100%;overflow-x:hidden}
+.landing-root .real-mohalla-site{overflow-x:clip}
+.landing-root .hero-viewport{min-width:0;grid-template-columns:minmax(0,1.25fr) minmax(310px,.75fr);align-items:center}
+.landing-root .hero-left,.landing-root .hero-right{min-width:0}
+@media(max-width:900px){.landing-root .hero-viewport{display:flex;flex-direction:column;align-items:stretch}.landing-root .hero-right{width:100%}}
+.shout-panel{max-width:min(440px,90vw);max-height:40vh;overflow:auto}
+.shout-options{display:flex;gap:6px;flex-wrap:wrap}
+.shout-options button{width:auto;min-width:78px}
+
+.landing-root .hero-viewport{box-sizing:border-box;padding:40px clamp(20px,4vw,64px);gap:48px;max-width:1320px}
+.landing-root .arcade-cover h2{font-size:clamp(48px,6.2vw,86px);line-height:1.03;transform:skew(-4deg);margin:0 0 28px}
+.landing-root .adda-card{box-sizing:border-box;padding:28px;box-shadow:6px 6px 0 #490b30;border-radius:16px}
+.landing-root .adda-heading{font-size:38px}
+.landing-root .join-actions{display:flex;flex-direction:column;gap:16px}
+.landing-root .join-inline{display:flex;min-width:0;gap:8px}
+.landing-root .join-inline input{min-width:0;flex:1;width:100%}
+.landing-root .join-inline button{flex-shrink:0}
+.landing-root .gali-demo{margin:0;max-width:100%;box-sizing:border-box}
+.landing-root .gali-dialogue strong{font-size:clamp(22px,2.8vw,36px)}
+.landing-root .site-header{padding:20px clamp(20px,4vw,64px)}
+.landing-root .brand-title{font-size:clamp(28px,3.3vw,46px)!important}
+.intro-curtain .curtain-stage{min-height:0;height:min(64svh,520px)}
+.intro-curtain .intro-hand{position:absolute;width:clamp(160px,24vw,290px);height:auto;top:20%;margin:0}
+.intro-curtain .intro-title-lockup{pointer-events:none}
+.intro-exit .intro-hand{opacity:0}
+.intro-curtain .skip-intro-btn{z-index:20;min-height:48px}
+.real-mohalla-site,.intro-curtain,.shutter-hand{image-rendering:auto}
+@media(max-width:900px){.landing-root .hero-viewport{gap:32px;padding:28px 20px}.landing-root .hero-right{order:-1}.landing-root .adda-card{max-width:600px}.landing-root .arcade-cover h2{font-size:52px}.landing-root .site-header{gap:12px}.landing-root .badge-btn{font-size:12px}}

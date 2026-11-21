@@ -45,7 +45,7 @@ export class Game {
       return false;
     }
     this.runnerId=targetId;
-    target.role='runner';target.catchGraceUntil=Date.now()+1600;
+    target.role='runner';target.catchGraceUntil=Date.now()+3500;
     this.phase='chase';
     this.relayDeadline=Date.now()+RELAY_LIMIT_MS;
     this.generateSafeZones(Date.now());
@@ -134,7 +134,7 @@ export class Game {
 
     runner.role='other';runner.input={seq:runner.lastSeq,dx:0,dz:0,sprint:false};runner.velocity={x:0,z:0};
 
-    target.role='runner';target.catchGraceUntil=Date.now()+1600;target.input={seq:target.lastSeq,dx:0,dz:0,sprint:false};target.velocity={x:0,z:0};
+    target.role='runner';target.catchGraceUntil=Date.now()+3500;target.input={seq:target.lastSeq,dx:0,dz:0,sprint:false};target.velocity={x:0,z:0};
 
     this.runnerId=target.id;
     this.relayDeadline=Date.now()+RELAY_LIMIT_MS;
@@ -162,7 +162,7 @@ export class Game {
         continue;
       }
       const isSpectator = this.phase==='chase' && p.id!==this.dennerId && p.id!==this.runnerId;
-      if(now-p.lastInputAt>250)p.input={...p.input,dx:0,dz:0,sprint:false};
+      if(!p.bot&&now-p.lastInputAt>250)p.input={...p.input,dx:0,dz:0,sprint:false};
       const sprinting=p.input.sprint&&(p.input.dx!==0||p.input.dz!==0);
       p.stamina=Math.max(0,Math.min(100,p.stamina+(sprinting?-42:24)/60));
       if(p.stamina<=0)p.input.sprint=false;
@@ -199,7 +199,7 @@ export class Game {
     if(this.phase==='chase'&&this.dennerId){
       const dennerPos = this.member(this.dennerId).position;
       for(const p of this.members.values()){
-        if(p.id!==this.dennerId && p.id!==this.runnerId && p.connected && !this.isPlayerSafe(p)){
+        if(p.id!==this.dennerId && p.id!==this.runnerId && p.connected && now>=this.member(this.runnerId!).catchGraceUntil && !this.isPlayerSafe(p)){
           if(caught(dennerPos, p.position)){
             this.runnerId = p.id; // Target switched to caught spectator!
             this.catchRunner(`Safe zone ke bahar pakde gaye! ${p.name} is OUT!`);

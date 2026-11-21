@@ -1,4 +1,4 @@
-import {useEffect,useState,type ReactNode} from 'react';
+import {useEffect,useRef,useState,type ReactNode} from 'react';
 import './landing.css';
 import {sounds} from './sound';
 
@@ -9,12 +9,19 @@ export function Landing({children,onPlay}:{children:ReactNode;onPlay:()=>void}){
   // Agar user iss session mein pehle dekh chuka hai toh direct site dikhao
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches || Boolean(sessionStorage.getItem('chicklets_intro_seen')) || new URLSearchParams(location.search).has('room');
  });
+ const skipButton=useRef<HTMLButtonElement>(null);
+ const replayButton=useRef<HTMLButtonElement>(null);
  const [animStep,setAnimStep]=useState<'knock1'|'knock2'|'reveal'|'exit'|'done'>('knock1');
 
  useEffect(()=>{
   if(loaded)return;
 
-  // Sound effects & stage progression during preloader
+  skipButton.current?.focus();
+  const previousOverflow=document.body.style.overflow;
+  document.body.style.overflow='hidden';
+  const escape=(event:KeyboardEvent)=>{if(event.key==='Escape')finishIntro()};
+  window.addEventListener('keydown',escape);
+  // Progress the introduction without delaying the form.
   sounds.playKnock();
   const t1=setTimeout(()=>{
     setAnimStep('knock2');
@@ -28,14 +35,18 @@ export function Landing({children,onPlay}:{children:ReactNode;onPlay:()=>void}){
   const t3=setTimeout(()=>setAnimStep('exit'),2450);
 
   const t4=setTimeout(()=>{
-    setAnimStep('done');
-    setLoaded(true);
-    sessionStorage.setItem('chicklets_intro_seen','true');
+    finishIntro();
   },PRELOADER_DURATION);
 
-  return ()=>{clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);clearTimeout(t4)};
+  return ()=>{clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);clearTimeout(t4);document.body.style.overflow=previousOverflow;window.removeEventListener('keydown',escape)};
  },[loaded]);
 
+ function finishIntro(){
+  setLoaded(true);
+  setAnimStep('done');
+  try{sessionStorage.setItem('chicklets_intro_seen','true')}catch{}
+  requestAnimationFrame(()=>replayButton.current?.focus());
+ }
  function replayIntro(){
   sessionStorage.removeItem('chicklets_intro_seen');
   setAnimStep('knock1');
@@ -47,7 +58,7 @@ export function Landing({children,onPlay}:{children:ReactNode;onPlay:()=>void}){
       1. INTRO / PRELOADER CURTAIN (Only during animation)
       ══════════════════════════════════════════════ */}
   {!loaded&&(
-   <aside className={`intro-curtain intro-${animStep}`} aria-label="Game introduction">
+   <aside role="dialog" aria-modal="true" className={`intro-curtain intro-${animStep}`} aria-label="Game introduction">
     <div className="curtain-vignette"/>
     <div className="intro-door door-left"><img className="shutter-hand" alt="" src="/art/knocking-hand.png"/><span>LANE 04</span></div>
     <div className="intro-door door-right"><img className="shutter-hand" alt="" src="/art/knocking-hand.png"/><span>KNOCK HERE</span></div>
@@ -67,8 +78,8 @@ export function Landing({children,onPlay}:{children:ReactNode;onPlay:()=>void}){
       </div>
       <p className="intro-tagline">Who’s there?</p>
     </div>
-    <button className="skip-intro-btn" onClick={()=>{setLoaded(true);sessionStorage.setItem('chicklets_intro_seen','true');onPlay();}}>
-      Play now <span aria-hidden="true">→</span>
+    <button ref={skipButton} className="skip-intro-btn" onClick={finishIntro}>
+      Skip intro <span aria-hidden="true">→</span>
     </button>
    </aside>
   )}
@@ -76,7 +87,7 @@ export function Landing({children,onPlay}:{children:ReactNode;onPlay:()=>void}){
   {/* ══════════════════════════════════════════════
       2. REAL WEBSITE (Pure, Clean, Authentic Mohalla UI - No Hands!)
       ══════════════════════════════════════════════ */}
-  <main className="real-mohalla-site">
+  <main className="real-mohalla-site" inert={!loaded}>
    {/* Header Navigation */}
    <header className="site-header">
     <div className="header-brand">
@@ -87,7 +98,7 @@ export function Landing({children,onPlay}:{children:ReactNode;onPlay:()=>void}){
      </div>
     </div>
     <div className="header-actions">
-     <button className="badge-btn" onClick={replayIntro} title="Watch intro again">
+     <button ref={replayButton} className="badge-btn" onClick={replayIntro} title="Watch intro again">
       Replay Intro ↺
      </button>
     </div>
@@ -98,7 +109,7 @@ export function Landing({children,onPlay}:{children:ReactNode;onPlay:()=>void}){
     {/* Left Column: Game Lore & Visual Banner */}
     <section className="hero-left">
      <div className="arcade-cover">
-      <h2>Knock knock.<br/><em>Are you BMW?</em></h2>
+      <h2>Knock. Guess.<br/><em>Run.</em></h2>
       <StreetDemo/>
       <details className="rulebook"><summary>How to play</summary>
        <ol><li><strong>Pick a secret.</strong> The Denner picks a category. If it’s cars, each player secretly picks a different car.</li>

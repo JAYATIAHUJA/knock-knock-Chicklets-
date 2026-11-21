@@ -57,7 +57,7 @@ export function KnockPlay({room,id,identity,act}:Props){
  }
  if(room.phase==='chase'&&room.runnerId===id&&room.category){
   return <section className="shout-panel" aria-label="Call another secret name">
-   <h2>Pass the chase!</h2><p>{canPass?'Call someone’s secret and they run. Guess wrong and you’re out.':'A relay needs a third player.'}</p>
+   <h2>Run!</h2><p>{canPass?'Call another player when you know their secret.':'A relay needs a third player.'}</p>
    {canPass&&<><div className="shout-options">{callNames.map((name,index)=><button key={name} onPointerDown={event=>event.preventDefault()} onClick={()=>void shout(name)}><kbd>{index+1}</kbd> {name}!</button>)}</div><small className="shout-hint">WASD to run · Press 1–7 or tap a name</small></>}
   </section>;
  }
