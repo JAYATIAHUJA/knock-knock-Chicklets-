@@ -13,7 +13,7 @@ export function KnockPlay({room,id,identity,act}:Props){
  async function shout(name:string){
   if(callPending.current)return;
   callPending.current=true;
-  sounds.playRelayTransfer();
+
   try{await act('call-name',name)}finally{callPending.current=false}
  }
 
@@ -48,16 +48,9 @@ export function KnockPlay({room,id,identity,act}:Props){
     <span className="knock-tap" aria-hidden="true">Knock knock!</span>
     <p className="knock-from">{addressed?`${asker} knocked on your back`:denner?`${target} got your guess…`:`${asker} → ${target}`}</p>
     <h2 className="gali-question">“Are you {knock.name}?”</h2>
-    {addressed?<><p className="knock-help">Give them a comeback. The game checks the guess.</p><div className="banter-options">{['Wrong address.','Ask my lawyer.','Catch me first.'].map(text=><button key={text} disabled={busy} onClick={()=>respond(text)}>{text}</button>)}</div>
+    {addressed?<><p className="knock-help">Give them a comeback. The game checks the guess.</p><div className="banter-options">{['Catch me first.'].map(text=><button key={text} disabled={busy} onClick={()=>respond(text)}>{text}</button>)}</div>
       <form onSubmit={event=>{event.preventDefault();void respond(reply)}}><label htmlFor="knock-reply">Your comeback</label><div className="reply-row"><input id="knock-reply" autoFocus maxLength={120} value={reply} onChange={event=>setReply(event.target.value)} placeholder="Your version of events…"/><button disabled={busy||!reply.trim()} type="submit">Send →</button></div></form>
-     </>:!denner?<div className="bluff-intercept-box">
-      <p className="bluff-title">🕵️‍♂️ Throw the Denner off:</p>
-      <div className="bluff-options">
-       <button onClick={()=>void act('bluff-signal',{type:'nod'})}>👉 "Yep. Absolutely them."</button>
-       <button onClick={()=>void act('bluff-signal',{type:'fake'})}>🙅 "Wild accusation."</button>
-      </div>
-      <p className="knock-help">{target} is thinking of a comeback…</p>
-     </div>:<p className="knock-help">{target} is thinking of a comeback…</p>}
+     </>:<p className="knock-help">{target} is thinking of a comeback…</p>}
     <small>{seconds}s · until the guess is checked</small>
    </div>
   </div>;

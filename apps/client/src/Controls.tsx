@@ -3,11 +3,15 @@ import {canMove,type PublicRoom} from '@chicklets/shared';
 import {socket} from './network';
 import {sounds} from './sound';
 
+export const localMotionInput={seq:0,dx:0,dz:0,sprint:false};
+
 export function Controls({room,id}:{room:PublicRoom;id:string}){
  const pressed=useRef(new Set<string>()),touch=useRef(new Set<string>()),seq=useRef(Date.now());
  const allowed=canMove(room.phase,id,room.dennerId,room.runnerId);
  const me=room.players.find(p=>p.id===id);
  const stamina=Math.round(me?.stamina??100);
+ const energy=useRef(stamina);
+ energy.current=stamina;
  const lastStep=useRef(0);
 
  useEffect(()=>{
@@ -23,7 +27,7 @@ export function Controls({room,id}:{room:PublicRoom;id:string}){
    const moving=rawDx!==0||rawDz!==0;
    const wantSprint=keys.has('shift')&&moving;
 
-   const actualSprint=wantSprint&&stamina>0;
+   const actualSprint=wantSprint&&energy.current>8;
 
    // Footstep SFX when moving
    const now=Date.now();
@@ -32,11 +36,12 @@ export function Controls({room,id}:{room:PublicRoom;id:string}){
     lastStep.current=now;
    }
 
-   socket.emit('input',{seq:++seq.current,dx:rawDx,dz:rawDz,sprint:actualSprint});
+   Object.assign(localMotionInput,{seq:++seq.current,dx:allowed?rawDx:0,dz:allowed?rawDz:0,sprint:actualSprint});
+   if(allowed)socket.emit('input',localMotionInput);
   },1000/30);
 
-  return()=>{clearInterval(timer);window.removeEventListener('keydown',down);window.removeEventListener('keyup',up);window.removeEventListener('blur',blur)}
- },[allowed,stamina]);
+  return()=>{Object.assign(localMotionInput,{dx:0,dz:0,sprint:false});clearInterval(timer);window.removeEventListener('keydown',down);window.removeEventListener('keyup',up);window.removeEventListener('blur',blur)}
+ },[allowed]);
 
  const button=(key:string,label:string,style?:string)=><button className={`pad-key ${style||''}`} aria-label={label} disabled={!allowed} onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);touch.current.add(key)}} onPointerUp={()=>touch.current.delete(key)} onPointerCancel={()=>touch.current.delete(key)} onLostPointerCapture={()=>touch.current.delete(key)}>{label}</button>;
 

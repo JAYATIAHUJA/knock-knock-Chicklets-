@@ -529,3 +529,11 @@
 .real-mohalla-site,.intro-curtain{image-rendering:pixelated}
 .hero-poster,.adda-card{border-radius:0;box-shadow:8px 8px 0 #1b2b23}
 .f-badge,.badge-btn,.adda-form-container .join-card input:not([type=checkbox]){border-radius:0}
+
+.room-settings summary{cursor:pointer;padding:.7rem 0;font-weight:700}
+.shutter-hand{position:absolute;top:45%;width:min(25vw,230px);opacity:0;image-rendering:pixelated}
+.door-left .shutter-hand{right:0;transform:scaleX(-1)}
+.door-right .shutter-hand{left:0}
+.intro-reveal .shutter-hand{opacity:1}
+.intro-door{background-image:repeating-linear-gradient(0deg,#233c35 0 3px,#4b6855 4px,#375343 7px,#324a3c 16px)}
+

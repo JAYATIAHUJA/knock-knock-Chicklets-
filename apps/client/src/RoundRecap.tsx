@@ -2,6 +2,7 @@ type Props = {
   runnerName: string;
   dennerName: string;
   newDennerName: string;
+  chain: string[];
   survivalMs: number;
   relayCount: number;
   catchReason: string;
@@ -12,7 +13,7 @@ function fmt(ms:number){
   return s>=60?`${Math.floor(s/60)}m ${s%60}s`:`${s}s`;
 }
 
-export function RoundRecap({runnerName,dennerName,newDennerName,survivalMs,relayCount,catchReason}:Props){
+export function RoundRecap({runnerName,dennerName,newDennerName,chain,survivalMs,relayCount,catchReason}:Props){
   const badges=[];
   if(survivalMs>30000)badges.push({e:'⭐',t:'Brave Runner!'});
   if(relayCount>=2)   badges.push({e:'👑',t:'Relay King!'});
@@ -23,6 +24,7 @@ export function RoundRecap({runnerName,dennerName,newDennerName,survivalMs,relay
       <div className="recap-inner">
         <div className="recap-header">
           <h2>{newDennerName} out!</h2>
+          {chain.length>1&&<p aria-label="Chase order">{chain.join(" → ")}</p>}
           <p className="recap-reason">{catchReason}</p>
         </div>
 

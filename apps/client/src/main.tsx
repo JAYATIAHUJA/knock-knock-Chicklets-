@@ -1,1 +1,1 @@
-import React from 'react';import{createRoot}from'react-dom/client';import App from './App';import './style.css';import './gameplay.css';createRoot(document.getElementById('root')!).render(<React.StrictMode><App/></React.StrictMode>);
+import React from 'react';import{createRoot}from'react-dom/client';import App from './App';import './style.css';import './gameplay.css';import './poster-theme.css';createRoot(document.getElementById('root')!).render(<React.StrictMode><App/></React.StrictMode>);

@@ -15,19 +15,19 @@ export function RoleReveal({isDenner,playerColor,playerName,onDone}:Props){
   useEffect(()=>{
     sounds.playRoleReveal(isDenner);
     // in: 1.1s, hold: 1.4s, out: 0.8s → total ~3.3s
-    const t1=setTimeout(()=>setPhase('hold'),1100);
-    const t2=setTimeout(()=>setPhase('out'),2500);
-    const t3=setTimeout(()=>{if(!done.current){done.current=true;onDone();}},3300);
+    const t1=setTimeout(()=>setPhase('hold'),300);
+    const t2=setTimeout(()=>setPhase('out'),950);
+    const t3=setTimeout(()=>{if(!done.current){done.current=true;onDone();}},1250);
     return ()=>{clearTimeout(t1);clearTimeout(t2);clearTimeout(t3)};
   },[]);
 
-  const label   = isDenner ? 'DENNER' : 'KHILADI';
+  const label   = isDenner ? 'DENNER' : 'PLAYER';
   const sublabel= isDenner ? 'You’re the chaser.' : 'Keep a straight face.';
   const emoji   = isDenner ? '👑' : '🎭';
   const accent  = isDenner ? '#d44a2a' : '#3a9e72';
 
   return (
-    <div className={`role-reveal role-reveal--${phase}`} aria-modal aria-label="Role assigned">
+    <div className={`role-reveal role-reveal--${phase}`} role="status" aria-label="Role assigned">
       {/* Background rings (expand outward like Among Us) */}
       {[0,1,2,3].map(i=>(
         <div key={i} className="role-ring" style={{

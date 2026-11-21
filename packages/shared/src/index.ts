@@ -16,10 +16,10 @@ export function canMove(phase:Phase,id:string,dennerId:string|null,runnerId:stri
   return false;
 }
 export function move(pos:Vec,input:Input,dt=TICK){const len=Math.hypot(input.dx,input.dz);const scale=len>1?1/len:1;const speed=SPEED*(input.sprint?SPRINT:1);return {x:pos.x+input.dx*scale*speed*dt,z:pos.z+input.dz*scale*speed*dt}}
-export function stepMotion(pos:Vec,velocity:Vec,input:Input,dt=TICK,isSpectator=false){
+export function stepMotion(pos:Vec,velocity:Vec,input:Input,dt=TICK,isSpectator=false,launching=false){
   const len=Math.hypot(input.dx,input.dz);
   const scale=len>1?1/len:1;
-  const top=isSpectator?SPECTATOR_SPEED:(SPEED*(input.sprint?SPRINT:1));
+  const top=isSpectator?SPECTATOR_SPEED:(SPEED*(input.sprint?SPRINT:1)*(launching?1.45:1));
   const target={x:input.dx*scale*top,z:input.dz*scale*top};
   const response=len>0?17:22;
   const blend=1-Math.exp(-response*dt);

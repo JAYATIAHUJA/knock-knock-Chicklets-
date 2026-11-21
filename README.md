@@ -43,3 +43,6 @@ Choose **2 computer friends** or **3 computer friends** on the start screen, cre
 - 🎨 [Game & Design Philosophy (DESIGN.md)](DESIGN.md): Aesthetic mood, 3D courtyard vision, and state diagrams.
 - 📄 [License](LICENSE): MIT License.
 
+
+### Vercel deployment
+Import the repository root. vercel.json builds the shared package and client. Set VITE_SERVER_URL to the HTTPS URL of your persistent Node multiplayer server before deployment. Run the server separately using npm run start -w @chicklets/server after building the shared and server workspaces. Verify its /health endpoint before inviting players.

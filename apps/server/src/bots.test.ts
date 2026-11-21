@@ -17,9 +17,9 @@ test('bots choose distinct identities and answer a real knock after a delay',()=
  assert.equal(g.phase,'guessing');const bots=[...g.members.values()].filter(p=>p.bot);
  assert.notEqual(bots[0].identity,bots[1].identity);
  g.member('human').position={x:0,z:0};bots[0].position={x:2.4,z:0};
- g.knock('human',bots[0].id,bots[0].identity!);g.tick(now+5100);assert.equal(g.phase,'knock');
+ g.knock('human',bots[0].id,'Mahindra');g.tick(now+5100);assert.equal(g.phase,'knock');
  for(let i=0;i<90;i++)g.tick(now+5200+i*17);
- assert.ok(g.phase==='chase'||g.phase==='caught');assert.equal(g.pendingKnock,null);
+ assert.equal(g.phase,'guessing');assert.equal(g.pendingKnock,null);
 });
 test('bot denner selects category, approaches and guesses without reading human secret',()=>{
  const g=new Game(3);g.add('human','You','#123456');g.addBots(2);g.start();

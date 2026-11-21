@@ -1,4 +1,4 @@
-import {CATEGORIES,type Vec} from '@chicklets/shared';
+import {ARENA,CATEGORIES,type Vec} from '@chicklets/shared';
 import type {Game} from './game.js';
 
 /** Local rule-based opponents. No external AI service or hidden-name lookup. */
@@ -36,8 +36,17 @@ export class ComputerFriends {
     if(runner.bot){
      const away={x:runner.position.x-denner.position.x,z:runner.position.z-denner.position.z};
      const len=Math.hypot(away.x,away.z)||1;
-     // Gradually turn inwards before the chalk boundary, with a little sideways dodge.
-     steer(runner.id,{x:away.x/len-runner.position.x/13+Math.sin(now/700)*.4,z:away.z/len-runner.position.z/13+Math.cos(now/900)*.4},true);
+     const course={x:away.x/len,z:away.z/len};
+     // Follow the edge when the direct escape route would cross the chalk.
+     for(const axis of ['x','z'] as const){
+      const other=axis==='x'?'z':'x';
+      if(Math.abs(runner.position[axis])>ARENA-3 && course[axis]*runner.position[axis]>=0){
+       course[axis]=-Math.sign(runner.position[axis])*.35;
+       if(Math.abs(course[other])<.3)course[other]=runner.position[other]>0?-1:1;
+      }
+     }
+     if(!course.x&&!course.z)course.x=1;
+     steer(runner.id,course,true);
     }
    }
   }

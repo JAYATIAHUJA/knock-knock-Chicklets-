@@ -19,8 +19,8 @@ function useSurface(name: string, repeat: number) {
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(repeat, repeat);
     const pixel=getTextureFilterMode(i)==='pixel';
-    texture.magFilter = pixel?THREE.NearestFilter:THREE.LinearFilter;
-    texture.minFilter = pixel?THREE.NearestFilter:THREE.LinearMipmapLinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.minFilter = THREE.LinearMipmapLinearFilter;
     texture.generateMipmaps = !pixel;
     texture.anisotropy = 1;
     texture.colorSpace = i === 0 ? THREE.SRGBColorSpace : THREE.NoColorSpace;
@@ -160,6 +160,16 @@ export const World = memo(function World() {
     {[-1,1].map(side=><group key={side}><mesh position={[side*20,.035,0]} rotation={[-Math.PI/2,0,0]}><planeGeometry args={[.12,40]}/><meshStandardMaterial color="#e0cba4"/></mesh><mesh position={[0,.035,side*20]} rotation={[-Math.PI/2,0,0]}><planeGeometry args={[40,.12]}/><meshStandardMaterial color="#e0cba4"/></mesh></group>)}
     <StaticArchitecture>
     <StreetLife/>
+    <group position={[-15,0,-21.3]}>
+     {[-2,2].map(x=><Block key={x} at={[x,1.65,0]} size={[.13,3.3,.13]} color="#614737"/>)}
+     {Array.from({length:9},(_,i)=><Block key={i} at={[(i-4)*.52,3.2,0]} size={[.52,.22,2.2]} color={i%2?'#fff0bb':'#b53d37'}/>)}
+     <Block at={[0,.82,0]} size={[4.2,.23,1.35]} color="#66432e"/>
+     {['#f2a036','#8ea641','#cf5036'].map((color,i)=><group key={color} position={[(i-1)*1.34,1,0]}>
+      <Block at={[0,.1,0]} size={[1.23,.24,1.05]} color="#a47849"/>
+      {[-.37,0,.37].map(x=>[-.25,.14].map(z=><Block key={x+','+z} at={[x,.36,z]} size={[.32,.32,.32]} color={color}/>))}
+      <Block at={[0,.61,0]} size={[.32,.27,.32]} color={color}/>
+     </group>)}
+    </group>
     {[-18,-9,0,9,18].map((x,i)=><Building key={`north${i}`} x={x} z={-25} color={['#bc795f','#63aaa4','#c4a77a','#c29b52','#c49d94'][i]} label={[-18,-9,9].includes(x)?'':['','','TOWN SQUARE','','RAJU’S STORE'][i]} index={i}/>)}
     {[-18,-9,0,9,18].map((x,i)=><Building key={`s${i}`} x={x} z={25} rotation={Math.PI} color={i%2?'#aab1a0':'#c3b298'} label="STREET MARKET" index={i+2}/>)}
     {[-12,-3,6,15].map((z,i)=><group key={i}><Building x={-26} z={z} rotation={Math.PI/2} color="#b5ae98" label="DAILY NEEDS" index={i}/><Building x={26} z={z} rotation={-Math.PI/2} color="#c6b397" label="CORNER SHOP" index={i+1}/></group>)}

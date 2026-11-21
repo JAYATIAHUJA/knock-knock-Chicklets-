@@ -698,3 +698,6 @@ h1, h2, .brand strong, .round-guide h2, .role-label, .recap-header h2 {
   transform: translate(1px, 1px);
   box-shadow: 1px 1px 0 #713f12;
 }
+
+.role-reveal{pointer-events:none}
+

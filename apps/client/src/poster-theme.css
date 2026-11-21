@@ -1,0 +1,62 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+:root{--poster-red:#9b123f;--poster-dark:#490b30;--poster-yellow:#ffca16;--poster-paper:#fff0c1}
+body{background:var(--poster-dark);font-family:'DM Sans',sans-serif}
+.app,.landing-root .real-mohalla-site{
+ color:var(--poster-paper);background-color:var(--poster-red);
+ background-image:repeating-linear-gradient(0deg,#ffc91607 0 1px,transparent 1px 4px),repeating-linear-gradient(90deg,#240c3612 0 1px,transparent 1px 3px),radial-gradient(ellipse at 20% 25%,transparent 0 32%,#54204e55 33% 35%,transparent 36% 44%,#54204e44 45% 47%,transparent 48%);
+ background-size:auto,auto,190px 260px;
+}
+.landing-root .site-header,.app>header{background:#690d32;border-color:#dc9b24;color:var(--poster-yellow)}
+.brand-title,.brand strong,.intro-title-lockup strong,.arcade-cover h2{
+ font-family:'Archivo Black',sans-serif!important;font-weight:400!important;
+ text-transform:uppercase;letter-spacing:-.065em!important;color:var(--poster-yellow)!important;
+ text-shadow:3px 4px 0 #680c34!important;transform:skew(-7deg) rotate(-2deg);
+}
+.brand-title{font-size:clamp(28px,4vw,54px)!important}
+.arcade-cover h2{font-size:clamp(52px,7.2vw,110px);line-height:.91;margin-bottom:28px}
+.arcade-cover h2 em{color:var(--poster-yellow);font-style:normal}
+.landing-root .adda-card{background:var(--poster-paper);border:3px solid var(--poster-dark);box-shadow:9px 9px 0 var(--poster-dark);color:var(--poster-dark)}
+.landing-root .adda-heading,.round-guide h2,.gali-question,.shout-panel h2,.recap-header h2{
+ font-family:'Barlow Condensed',sans-serif!important;font-weight:800;text-transform:uppercase;letter-spacing:-.025em;
+}
+.landing-root .adda-heading{color:var(--poster-red);font-size:52px}
+button,input,select{font-family:'DM Sans',sans-serif}
+button{border-radius:3px!important}
+button.primary,.adda-form-container button.primary,.gali-demo>button{
+ background:var(--poster-yellow);color:var(--poster-dark);border:2px solid var(--poster-dark);box-shadow:4px 4px 0 var(--poster-dark);
+ font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;text-transform:uppercase;
+}
+button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid #ed4585;outline-offset:4px}
+.landing-root .badge-btn{color:var(--poster-paper);border-color:#efbd65;background:transparent}
+.rulebook strong{color:var(--poster-yellow)}
+.gali-demo{border-color:var(--poster-dark);background-color:#75133b}
+.gali-dialogue{background:var(--poster-paper);color:var(--poster-dark);border-color:var(--poster-dark)}
+.intro-curtain{background:var(--poster-dark)}
+.intro-door{background-color:var(--poster-red);background-image:repeating-linear-gradient(0deg,#650d32 0 3px,#ab2049 4px,#94133e 8px,#94133e 16px);border-color:var(--poster-yellow)}
+.intro-door span,.intro-overline,.intro-tagline{color:var(--poster-yellow)}
+.intro-title-lockup strong{font-size:clamp(60px,13vw,180px)}
+.skip-intro-btn{background:var(--poster-yellow);color:var(--poster-dark);border-color:var(--poster-dark)}
+.round-guide,.shout-panel,.round-recap .recap-inner{background:var(--poster-paper);color:var(--poster-dark);border-color:var(--poster-dark)}
+.phase-chip,.secret-reminder{background:var(--poster-yellow);color:var(--poster-dark)}
+.shout-options button{background:var(--poster-yellow);color:var(--poster-dark);border:2px solid var(--poster-dark)}
+@media(max-width:600px){.arcade-cover h2{font-size:clamp(42px,11vw,66px)}.landing-root .adda-heading{font-size:38px}.intro-title-lockup strong{font-size:15vw;letter-spacing:-.075em!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important}}
+
+/* Gameplay uses one contextual instruction and a clear playfield. */
+.in-game .scene canvas{image-rendering:auto!important}
+.in-game>header{background:transparent!important;pointer-events:none;box-shadow:none;border:0}
+.in-game>header button{pointer-events:auto}
+.in-game .brand,.in-game .room-code{transform:none;border-radius:12px;background:#fff8e8;box-shadow:0 3px 15px #0002}
+.in-game .round-guide{position:fixed!important;top:100px!important;bottom:auto!important;left:50%!important;transform:translateX(-50%)!important;width:min(460px,70vw);padding:12px 20px;border:0;border-radius:12px;box-shadow:0 4px 18px #0002;text-align:center}
+.in-game .round-guide nav,.in-game .scene-overlay,.in-game .side-heading,.in-game .side-bottom{display:none!important}
+.in-game .round-guide h2{font-size:24px;margin:0 0 4px}
+.in-game .round-guide p{margin:0;font-size:14px}
+.in-game .sidebar{border-radius:16px!important;transform:none!important;background:#fff8e8;box-shadow:0 6px 24px #0002}
+.in-game .phase-guessing .sidebar,.in-game .phase-chase .sidebar,.in-game .phase-knock .sidebar,.in-game .phase-caught .sidebar{display:none!important}
+.in-game .phase-category .player-list,.in-game .phase-identity .player-list{display:none}
+.in-game .controls{bottom:20px!important;left:20px!important;transform:none!important}
+.nearby-knock{position:fixed;z-index:40;top:60%;left:50%;transform:translateX(-50%);padding:14px 22px;background:#ffca16;color:#490b30;border:2px solid #490b30;border-radius:12px!important;box-shadow:0 5px 20px #0003;font-weight:700}
+.nearby-knock kbd{margin-left:12px;font-size:12px}
+@media(max-width:600px){.in-game .round-guide{top:82px!important;width:85vw}.in-game .sidebar{top:190px!important;width:90vw!important;right:5vw!important;max-height:45vh;overflow:auto}.nearby-knock{top:52%;white-space:nowrap}}

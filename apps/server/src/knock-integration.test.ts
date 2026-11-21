@@ -22,9 +22,11 @@ test('three sockets complete knock, custom reply, relay and wrong-call eliminati
   let seq=1;const moving=setInterval(()=>{const d=room.players.find((p:any)=>p.id===sessions[di].playerId).position,r=room.players.find((p:any)=>p.id===sessions[ri].playerId).position,dx=r.x-d.x,dz=r.z-d.z,len=Math.hypot(dx,dz);sockets[di].emit('input',{seq:seq++,dx:len>2.1?dx/len:0,dz:len>2.1?dz/len:0,sprint:false})},35);
   try{await until(()=>{const d=room.players.find((p:any)=>p.id===sessions[di].playerId).position,r=room.players.find((p:any)=>p.id===sessions[ri].playerId).position;return Math.hypot(d.x-r.x,d.z-r.z)<2.2})}finally{clearInterval(moving)}
   await pause(40);sockets[di].emit('input',{seq:seq++,dx:0,dz:0,sprint:false});await pause(80);
-  await send(sockets[di],'guess',{targetId:sessions[ri].playerId,identity:'Maruti'});await until(()=>room.phase==='knock');
+  await send(sockets[di],'guess',{targetId:sessions[ri].playerId,identity:'Fiat'});await until(()=>room.phase==='knock');
   const knockId=room.knock.id;await assert.rejects(send(sockets[ni],'knock-reply',{knockId,text:'spoofed'}));
-  await send(sockets[ri],'knock-reply',{knockId,text:'Pehle toffee do!'});await until(()=>room.phase==='chase');assert.equal(room.speech.text,'Pehle toffee do!');
+  await send(sockets[ri],'knock-reply',{knockId,text:'Wrong address!'});await until(()=>room.phase==='guessing');
+  await send(sockets[di],'guess',{targetId:sessions[ri].playerId,identity:'Maruti'});await until(()=>room.phase==='chase');
+  assert.equal(room.knock,null);
   await send(sockets[ri],'call-name','BMW');await until(()=>room.runnerId===sessions[ni].playerId);assert.equal(room.players.find((p:any)=>p.id===sessions[ri].playerId).role,'other');
   await send(sockets[ni],'call-name','Fiat');await until(()=>room.phase==='caught');assert.equal(room.dennerId,sessions[ni].playerId);
  }finally{clients.forEach(s=>s.disconnect());child.kill()}

@@ -4,10 +4,10 @@ import {sounds} from './sound';
 
 const PRELOADER_DURATION=3000;
 
-export function Landing({children}:{children:ReactNode}){
+export function Landing({children,onPlay}:{children:ReactNode;onPlay:()=>void}){
  const [loaded,setLoaded]=useState(()=>{
   // Agar user iss session mein pehle dekh chuka hai toh direct site dikhao
-  return Boolean(sessionStorage.getItem('chicklets_intro_seen'));
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches || Boolean(sessionStorage.getItem('chicklets_intro_seen')) || new URLSearchParams(location.search).has('room');
  });
  const [animStep,setAnimStep]=useState<'knock1'|'knock2'|'reveal'|'exit'|'done'>('knock1');
 
@@ -49,8 +49,8 @@ export function Landing({children}:{children:ReactNode}){
   {!loaded&&(
    <aside className={`intro-curtain intro-${animStep}`} aria-label="Game introduction">
     <div className="curtain-vignette"/>
-    <div className="intro-door door-left"><span>LANE 04</span></div>
-    <div className="intro-door door-right"><span>KNOCK HERE</span></div>
+    <div className="intro-door door-left"><img className="shutter-hand" alt="" src="/art/knocking-hand.png"/><span>LANE 04</span></div>
+    <div className="intro-door door-right"><img className="shutter-hand" alt="" src="/art/knocking-hand.png"/><span>KNOCK HERE</span></div>
     <div className="curtain-stage">
       <div className={`knock-fx ${animStep}`}>
         <span className="knock-word"><i>Knock</i><i>Knock</i></span>
@@ -67,8 +67,8 @@ export function Landing({children}:{children:ReactNode}){
       </div>
       <p className="intro-tagline">Who’s there?</p>
     </div>
-    <button className="skip-intro-btn" onClick={()=>{setLoaded(true);sessionStorage.setItem('chicklets_intro_seen','true');}}>
-      Skip intro <span aria-hidden="true">→</span>
+    <button className="skip-intro-btn" onClick={()=>{setLoaded(true);sessionStorage.setItem('chicklets_intro_seen','true');onPlay();}}>
+      Play now <span aria-hidden="true">→</span>
     </button>
    </aside>
   )}
@@ -98,7 +98,7 @@ export function Landing({children}:{children:ReactNode}){
     {/* Left Column: Game Lore & Visual Banner */}
     <section className="hero-left">
      <div className="arcade-cover">
-      <h2>Knock knock.<br/><em>Who’s there?</em></h2>
+      <h2>Knock knock.<br/><em>Are you BMW?</em></h2>
       <StreetDemo/>
       <details className="rulebook"><summary>How to play</summary>
        <ol><li><strong>Pick a secret.</strong> The Denner picks a category. If it’s cars, each player secretly picks a different car.</li>
@@ -111,7 +111,7 @@ export function Landing({children}:{children:ReactNode}){
     {/* Right Column: Adda Creation & Room Join */}
     <section className="hero-right">
      <div className="adda-card">
-      <h3 className="adda-heading">You in?</h3>
+      <h3 className="adda-heading">Play Chicklets</h3>
       
       {/* Form children passed from App.tsx */}
       <div className="adda-form-container">
