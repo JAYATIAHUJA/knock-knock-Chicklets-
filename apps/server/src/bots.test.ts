@@ -40,7 +40,7 @@ test('runner bot moves and relays only to an assigned connected identity',()=>{
  for(let i=0;i<120;i++)g.tick(now+i*17);
  assert.ok(Math.hypot(bots[0].position.x-2.4,bots[0].position.z)>1);
  const originalRandom=Math.random;Math.random=()=>0;
- try{g.computers.tick(g,now+7000);assert.equal(g.runnerId,bots[0].id);g.computers.tick(g,now+14000);assert.equal(g.phase,'chase');assert.equal(g.runnerId,bots[1].id)}finally{Math.random=originalRandom}
+ try{g.computers.tick(g,now+7000);assert.equal(g.runnerId,bots[0].id);g.member(bots[0].id).freezeUntil=0;g.computers.tick(g,now+14000);assert.equal(g.phase,'chase');assert.equal(g.runnerId,bots[1].id)}finally{Math.random=originalRandom}
 });
 
 test('spectator bots seek a safe spot instead of standing still during chase',()=>{

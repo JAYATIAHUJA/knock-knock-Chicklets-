@@ -46,12 +46,13 @@ test('Denner cannot move during the initial head start, then can move again',()=
  assert.equal(g.input(denner,{seq:3,dx:1,dz:0,sprint:false}),true);
 });
 
-test('relay protects the new runner without restarting the Denner freeze',()=>{
+test('relay keeps the Denner moving and allows an immediate tag outside safety',()=>{
  const {g,denner,runner,other}=chase();
  g.chaseStartsAt=Date.now()-1;
  g.member(other).position={...g.member(denner).position};g.callName(runner,'Guava');
  assert.equal(g.input(denner,{seq:1,dx:1,dz:0,sprint:true}),true);
- g.tick(g.member(other).catchGraceUntil-1);assert.equal(g.phase,'chase');assert.equal(g.runnerId,other);
+ assert.equal(g.member(other).catchGraceUntil,0);
+ g.tick(Date.now());assert.equal(g.phase,'caught');assert.equal(g.dennerId,other);
 });
 
 test('runner inside an active safe spot cannot be tagged in the tick or while calling a name',()=>{
@@ -65,6 +66,30 @@ test('runner inside an active safe spot cannot be tagged in the tick or while ca
   else {g.tick(now);assert.equal(g.runnerId,runner)}
   assert.equal(g.phase,'chase');
  }
+});
+
+test('Denner cannot enter an active safe spot or tag from inside one',()=>{
+ const {g,denner,runner,other}=chase();const now=Date.now();
+ g.chaseStartsAt=now-1;g.member(runner).catchGraceUntil=0;
+ g.member(runner).position={x:15,z:0};g.member(other).position={x:-15,z:0};
+ g.safeZones=[{id:'test',name:'Safe',x:4,z:0,radius:2,capacity:2,expiresAt:now+10000}];g.safeZoneNextRotationAt=now+10000;
+ const d=g.member(denner);d.position={x:0,z:0};d.input={seq:1,dx:1,dz:0,sprint:false};
+ for(let i=0;i<80;i++){d.lastInputAt=now+i*17;g.tick(now+i*17)}
+ assert.ok(d.position.x<=2,'Denner stayed outside the safe spot');
+ d.position={x:5.9,z:0};g.member(runner).position={x:6.3,z:0};g.member(runner).freezeUntil=0;g.member(other).position={x:15,z:0};
+ g.tick(now+1500);assert.equal(g.phase,'chase');
+ g.callName(runner,'Guava');assert.equal(g.phase,'chase');assert.equal(g.runnerId,other);
+});
+
+test('Denner collects the central freeze pickup and runner cannot move or relay briefly',()=>{
+ const {g,denner,runner}=chase();const now=Date.now();
+ g.chaseStartsAt=now-1;g.member(runner).position={x:12,z:0};
+ g.member(denner).position={x:0,z:0};g.safeZones=[];g.safeZoneNextRotationAt=now+10000;
+ g.tick(now);
+ assert.ok(g.member(runner).freezeUntil>now);
+ assert.equal(g.input(runner,{seq:1,dx:1,dz:0,sprint:false}),false);
+ assert.throws(()=>g.callName(runner,'Guava'),/frozen/i);
+ assert.ok((g.public().powerup?.availableAt??0)>now);
 });
 
 test('spectators are protected inside safe spots but caught immediately outside',()=>{

@@ -140,6 +140,19 @@ html,body,#root{max-width:100%;overflow-x:hidden}
 @keyframes world-loading-sweep{to{background-position:100% 0}}
 @media(max-width:600px){.intro-curtain .intro-title-lockup{padding:17px 18px}.intro-curtain .intro-title-lockup strong{font-size:clamp(33px,10.3vw,58px)}.intro-curtain .intro-hindi{font-size:12px}.intro-scene{background-position:48% center}}
 @media(prefers-reduced-motion:reduce){.intro-scene,.world-loading i{transition:none;animation:none}}
+.in-game .round-guide{position:fixed!important;top:94px!important;bottom:auto!important;left:50%!important;transform:translateX(-50%)!important;width:max-content!important;max-width:calc(100vw - 410px);padding:9px 14px!important;border:2px solid #4b2437;border-radius:8px;white-space:nowrap;font-size:13px;font-weight:800;line-height:1.3;box-shadow:3px 3px 0 #2a102644}
+.in-game .round-guide p,.in-game .round-guide h2,.in-game .round-guide nav,.in-game .round-guide .practice-tip{display:none}
+.in-game .round-guide strong{margin-left:10px;padding-left:10px;border-left:1px solid #9b8174;color:#7d3f39}
+.in-game.phase-chase .round-guide,.in-game.phase-guessing .round-guide{top:94px!important;bottom:auto!important;left:50%!important;transform:translateX(-50%)!important;width:max-content!important;max-width:calc(100vw - 410px);padding:9px 14px!important}
+.chase-map{position:absolute;z-index:4;top:94px;right:18px;width:174px;padding:10px;background:#fff3d9f2;color:#4b2437;border:2px solid #4b2437;border-radius:9px;box-shadow:4px 4px 0 #2a102644;pointer-events:none}
+.chase-map>strong{display:block;margin-bottom:6px;text-align:center;font:900 11px/1.2 'DM Sans',sans-serif;letter-spacing:.11em}
+.chase-map svg{display:block;width:100%;height:auto;background:#d9b883;border:1px solid #7b5a46;border-radius:4px}
+.map-ground{fill:#e9ce9c;stroke:#98775a;stroke-width:2}.map-lanes{fill:none;stroke:#c29b72;stroke-width:8;opacity:.65}.map-safe{fill:#46aa74aa;stroke:#20754b;stroke-width:2}
+.map-powerup{fill:#9654ba;stroke:#fff8e9;stroke-width:2}
+.freeze-sign{display:block;padding:3px 7px;background:#6c368b;color:#fff5e6;border:2px solid #fff5e6;font:900 12px/1 'DM Sans',sans-serif;letter-spacing:.09em;box-shadow:2px 2px #331544}
+.chase-map circle.map-denner{fill:#a43d43;stroke:#fff8e9;stroke-width:3}.chase-map circle.map-runner{fill:#285b9a;stroke:#fff8e9;stroke-width:3}
+.map-legend{display:grid;gap:4px;margin-top:7px;font:700 10px/1.2 'DM Sans',sans-serif;overflow:hidden}.map-legend span{display:flex;align-items:center;gap:5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.map-legend i{display:inline-block;width:10px;height:10px;flex:none;border-radius:50%}.map-legend i.map-denner{background:#a43d43}.map-legend i.map-runner{background:#285b9a}
+@media(max-width:700px){.in-game .round-guide,.in-game.phase-chase .round-guide,.in-game.phase-guessing .round-guide{top:67px!important;max-width:calc(100vw - 16px);font-size:11px;white-space:normal;text-align:center}.chase-map{top:115px;right:8px;width:122px;padding:6px}.chase-map>strong{font-size:8px;margin-bottom:4px}.map-legend{font-size:8px}.in-game .round-guide strong{margin-left:5px;padding-left:5px}}
 @media(max-height:500px){
  .phase-choice-stage{padding:65px 12px 12px}
  .in-game .shout-panel{top:70px;width:min(460px,calc(100vw - 330px));max-height:calc(100dvh - 90px)}

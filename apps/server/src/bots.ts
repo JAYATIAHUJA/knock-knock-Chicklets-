@@ -80,7 +80,7 @@ export class ComputerFriends {
     g.knock(denner.id,target.id,this.known.get(target.id)||CATEGORIES[g.category][attempt%CATEGORIES[g.category].length]);
    }
   }
-  if(g.phase==='chase'&&runner?.bot&&now-this.since>12000){
+  if(g.phase==='chase'&&runner?.bot&&now>=runner.freezeUntil&&now-this.since>12000){
    const names=g.privateFor(runner.id).callNames;
    if(names.length)g.callName(runner.id,names[0]);
   }

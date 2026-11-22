@@ -16,10 +16,11 @@ test('lobby readiness and roster appear together in the central choice stage',()
  assert.match(html,/phase-choice-stage lobby-stage/);assert.match(html,/Gather the gang/);assert.match(html,/I’M READY/);assert.match(html,/You \(you\)/);
 });
 
-test('Denner sees the current runner and direction throughout the chase',()=>{
+test('chase map shows both players at their server positions',()=>{
  const chase={...room,phase:'chase' as const,players:[{id:'denner',name:'You',position:{x:0,z:0},color:'#123456',ready:true,connected:true,role:'denner' as const,stamina:100},{id:'runner',name:'Chintu',position:{x:10,z:0},color:'#123456',ready:true,connected:true,role:'runner' as const,stamina:100}]};
  const hud=renderToStaticMarkup(<RunnerTracker room={chase} id="denner"/>);
- assert.match(hud,/Chintu/);assert.match(hud,/10m away/);assert.match(hud,/rotate\(90deg\)/);
+ assert.match(hud,/COURTYARD MAP/);assert.match(hud,/Chintu/);assert.match(hud,/cx="100" cy="100"/);assert.match(hud,/cx="147" cy="100"/);
+ assert.doesNotMatch(hud,/runner-arrow|m away/);
  assert.equal(renderToStaticMarkup(<RunnerTracker room={chase} id="runner"/>),'');
 });
 

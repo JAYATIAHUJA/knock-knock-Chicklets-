@@ -5,7 +5,7 @@ import { ARENA,CATEGORIES,canMove,caught,chooseDenner,stepMotion,outside,RELAY_L
 
 
 
-type Member = Player & {identity:string|null;input:Input;velocity:Vec;lastSeq:number;lastInputAt:number;catchGraceUntil:number};
+type Member = Player & {identity:string|null;input:Input;velocity:Vec;lastSeq:number;lastInputAt:number;catchGraceUntil:number;freezeUntil:number};
 
 export class Game {
 
@@ -13,13 +13,13 @@ export class Game {
 
   addBots(count:number){if(this.phase!=='lobby'||!Number.isInteger(count)||count<0||count>3||this.members.size+count>8)throw Error('Choose up to 3 computer friends in the lobby');for(let i=0;i<count;i++){const id=`bot-${randomBytes(6).toString('hex')}`;this.add(id,['Chintu','Gudiya','Bunty'][i],['#6b9b78','#d4a047','#8296bd'][i]);const p=this.member(id);p.bot=true;p.ready=true}}
 
-  code:string; members=new Map<string,Member>(); phase:PublicRoom['phase']='lobby'; category:Category|null=null; dennerId:string|null=null; runnerId:string|null=null; message='Gather your friends in the courtyard'; minPlayers:number; transitionAt=0; relayDeadline:number|null=null; chaseStartsAt=0; safeZones:SafeZone[]=[]; safeZoneNextRotationAt=0; bluffSignals:PublicRoom['bluffSignals']=[];
+  code:string; members=new Map<string,Member>(); phase:PublicRoom['phase']='lobby'; category:Category|null=null; dennerId:string|null=null; runnerId:string|null=null; message='Gather your friends in the courtyard'; minPlayers:number; transitionAt=0; relayDeadline:number|null=null; chaseStartsAt=0; powerupAvailableAt=0; safeZones:SafeZone[]=[]; safeZoneNextRotationAt=0; bluffSignals:PublicRoom['bluffSignals']=[];
 
   pendingKnock:PublicRoom['knock']=null; speech:PublicRoom['speech']=null;
 
   constructor(minPlayers=5,code=randomBytes(3).toString('hex').toUpperCase()){this.minPlayers=minPlayers;this.code=code}
 
-  add(id:string,name:string,color:string){if(this.phase!=='lobby')throw Error('Round already started');if(this.members.size>=8)throw Error('Room is full');if(!name.trim()||name.length>20)throw Error('Name must be 1â€“20 characters');if(!/^#[0-9a-fA-F]{6}$/.test(color))throw Error('Invalid colour');const n=this.members.size;this.members.set(id,{id,name:name.trim(),color,stamina:100,catchGraceUntil:0,ready:false,connected:true,position:{x:(n%4-1.5)*2.2,z:Math.floor(n/4)*2.2},role:'other',identity:null,input:{seq:0,dx:0,dz:0,sprint:false},velocity:{x:0,z:0},lastSeq:0,lastInputAt:0});return this.public()}
+  add(id:string,name:string,color:string){if(this.phase!=='lobby')throw Error('Round already started');if(this.members.size>=8)throw Error('Room is full');if(!name.trim()||name.length>20)throw Error('Name must be 1â€“20 characters');if(!/^#[0-9a-fA-F]{6}$/.test(color))throw Error('Invalid colour');const n=this.members.size;this.members.set(id,{id,name:name.trim(),color,stamina:100,catchGraceUntil:0,freezeUntil:0,ready:false,connected:true,position:{x:(n%4-1.5)*2.2,z:Math.floor(n/4)*2.2},role:'other',identity:null,input:{seq:0,dx:0,dz:0,sprint:false},velocity:{x:0,z:0},lastSeq:0,lastInputAt:0});return this.public()}
 
   remove(id:string){const wasDenner=id===this.dennerId,wasRunner=id===this.runnerId;this.members.delete(id);if(this.members.size<this.minPlayers){this.reset('Waiting for more players');return}if(wasDenner||wasRunner||this.phase==='identity'||this.phase==='knock'||this.phase==='caught'){this.reset('A player left. Ready up for a new round.')}else if(this.phase==='guessing'&&this.members.size-1===0){this.reset('Waiting for more players')} }
 
@@ -29,7 +29,7 @@ export class Game {
 
   ready(id:string,value:boolean){const p=this.member(id);if(this.phase!=='lobby')throw Error('Round already started');p.ready=!!value;if(this.members.size>=this.minPlayers&&[...this.members.values()].every(p=>p.ready))this.start();}
 
-  start(){this.computers.reset();this.dennerId=chooseDenner([...this.members.keys()]);this.runnerId=null;this.category=null;this.phase='category';this.message=`${this.member(this.dennerId).name} is the DENNER. Pick a category!`;for(const p of this.members.values()){p.role=p.id===this.dennerId?'denner':'other';p.identity=null;p.position=this.spawnPosition(p.id);p.input={seq:p.lastSeq,dx:0,dz:0,sprint:false}}}
+  start(){this.computers.reset();this.dennerId=chooseDenner([...this.members.keys()]);this.runnerId=null;this.category=null;this.phase='category';this.message=`${this.member(this.dennerId).name} is the DENNER. Pick a category!`;for(const p of this.members.values()){p.role=p.id===this.dennerId?'denner':'other';p.identity=null;p.freezeUntil=0;p.position=this.spawnPosition(p.id);p.input={seq:p.lastSeq,dx:0,dz:0,sprint:false}}}
 
   chooseCategory(id:string,category:Category){if(this.phase!=='category'||id!==this.dennerId)throw Error('Only the DENNER can choose now');if(!Object.hasOwn(CATEGORIES,category))throw Error('Invalid category');this.category=category;this.phase='identity';this.message='Choose your secret identity';}
 
@@ -49,6 +49,7 @@ export class Game {
     this.chaseStartsAt=target.catchGraceUntil;
     this.phase='chase';
     this.relayDeadline=Date.now()+RELAY_LIMIT_MS;
+    this.powerupAvailableAt=0;
     this.generateSafeZones(Date.now());
     this.message=`${target.name} is running! Baaki log Safe Spots (Oonch) par chado!`;
     return true;
@@ -120,12 +121,13 @@ export class Game {
     if(this.phase!=='chase'||id!==this.runnerId||!this.member(id).connected)throw Error('Only the runner can call a name');
 
     const runner=this.member(id);
+    if(Date.now()<runner.freezeUntil)throw Error('You are frozen briefly');
 
     if(typeof name!=='string'||!name.trim()||name.length>40)throw Error('Invalid call');
 
     if(name===runner.identity)throw Error('You cannot call your own name');
 
-    if(Date.now()>=runner.catchGraceUntil&&!this.isPlayerSafe(runner)&&caught(this.member(this.dennerId!).position,runner.position)){this.catchRunner('Pakde gaye!');return}
+    if(Date.now()>=runner.catchGraceUntil&&!this.isPlayerSafe(runner)&&!this.isInsideSafeZone(this.member(this.dennerId!).position)&&caught(this.member(this.dennerId!).position,runner.position)){this.catchRunner('Pakde gaye!');return}
 
     const target=[...this.members.values()].find(p=>p.id!==id&&p.id!==this.dennerId&&p.identity===name&&p.connected);
 
@@ -133,9 +135,9 @@ export class Game {
 
     this.speech={playerId:id,text:`${name}!`,expiresAt:Date.now()+4000};
 
-    runner.role='other';runner.input={seq:runner.lastSeq,dx:0,dz:0,sprint:false};runner.velocity={x:0,z:0};
+    runner.role='other';runner.freezeUntil=0;runner.input={seq:runner.lastSeq,dx:0,dz:0,sprint:false};runner.velocity={x:0,z:0};
 
-    target.role='runner';target.catchGraceUntil=Date.now()+RUNNER_HEAD_START_MS;target.input={seq:target.lastSeq,dx:0,dz:0,sprint:false};target.velocity={x:0,z:0};
+    target.role='runner';target.catchGraceUntil=0;target.freezeUntil=0;target.input={seq:target.lastSeq,dx:0,dz:0,sprint:false};target.velocity={x:0,z:0};
 
     this.runnerId=target.id;
     this.relayDeadline=Date.now()+RELAY_LIMIT_MS;
@@ -143,7 +145,7 @@ export class Game {
 
   }
 
-  input(id:string,input:Input){const p=this.member(id),now=Date.now();if(!p.connected||!canMove(this.phase,id,this.dennerId,this.runnerId,this.chaseStartsAt,now))return false;if(!Number.isInteger(input.seq)||input.seq<=p.lastSeq||!Number.isFinite(input.dx)||!Number.isFinite(input.dz)||Math.abs(input.dx)>1||Math.abs(input.dz)>1||typeof input.sprint!=='boolean')return false;if(now-p.lastInputAt<12)return false;p.lastInputAt=now;p.lastSeq=input.seq;p.input=input;return true}
+  input(id:string,input:Input){const p=this.member(id),now=Date.now();if(!p.connected||now<p.freezeUntil||!canMove(this.phase,id,this.dennerId,this.runnerId,this.chaseStartsAt,now))return false;if(!Number.isInteger(input.seq)||input.seq<=p.lastSeq||!Number.isFinite(input.dx)||!Number.isFinite(input.dz)||Math.abs(input.dx)>1||Math.abs(input.dz)>1||typeof input.sprint!=='boolean')return false;if(now-p.lastInputAt<12)return false;p.lastInputAt=now;p.lastSeq=input.seq;p.input=input;return true}
 
   tick(now=Date.now()){
     this.computers.tick(this,now);
@@ -158,7 +160,7 @@ export class Game {
       return;
     }
     for(const p of this.members.values()){
-      if(!p.connected||!canMove(this.phase,p.id,this.dennerId,this.runnerId,this.chaseStartsAt,now)){
+      if(!p.connected||now<p.freezeUntil||!canMove(this.phase,p.id,this.dennerId,this.runnerId,this.chaseStartsAt,now)){
         p.velocity={x:0,z:0};
         continue;
       }
@@ -169,6 +171,12 @@ export class Game {
       if(p.stamina<=0)p.input.sprint=false;
       const next=stepMotion(p.position,p.velocity,p.input,undefined,isSpectator);
       p.velocity=next.velocity;
+      if(this.phase==='chase'&&p.id===this.dennerId&&this.safeZones.some(zone=>{
+        if(now>=zone.expiresAt)return false;
+        const before=Math.hypot(p.position.x-zone.x,p.position.z-zone.z);
+        const after=Math.hypot(next.position.x-zone.x,next.position.z-zone.z);
+        return after<=zone.radius&&(before>zone.radius||after<before);
+      })){p.velocity={x:0,z:0};continue}
       if(this.phase==='chase'&&p.id===this.runnerId&&outside(next.position)){
         this.catchRunner('The runner crossed the boundary!');
         return;
@@ -185,6 +193,15 @@ export class Game {
       this.generateSafeZones(now);
       this.message='Safe Spots Badle! Naye spot par bhaago!';
     }
+    if(this.phase==='chase'&&this.dennerId&&this.runnerId&&now>=this.chaseStartsAt&&now>=this.powerupAvailableAt){
+      const denner=this.member(this.dennerId),runner=this.member(this.runnerId);
+      if(Math.hypot(denner.position.x,denner.position.z)<=1.3&&!this.isInsideSafeZone(denner.position,now)){
+        runner.freezeUntil=now+1400;
+        runner.input={seq:runner.lastSeq,dx:0,dz:0,sprint:false};runner.velocity={x:0,z:0};
+        this.powerupAvailableAt=now+18000;
+        this.message=`${denner.name} picked up Freeze! ${runner.name} is frozen briefly.`;
+      }
+    }
     // 20-second Relay Hot Potato Timeout
     if(this.phase==='chase'&&this.runnerId&&this.relayDeadline&&now>=this.relayDeadline){
       const runner=this.member(this.runnerId);
@@ -192,12 +209,12 @@ export class Game {
       return;
     }
     // Tag check: Denner catches Runner
-    if(this.phase==='chase'&&this.dennerId&&this.runnerId&&now>=this.member(this.runnerId).catchGraceUntil&&!this.isPlayerSafe(this.member(this.runnerId),now)&&caught(this.member(this.dennerId).position,this.member(this.runnerId).position)) {
+    if(this.phase==='chase'&&this.dennerId&&this.runnerId&&now>=this.member(this.runnerId).catchGraceUntil&&!this.isPlayerSafe(this.member(this.runnerId),now)&&!this.isInsideSafeZone(this.member(this.dennerId).position,now)&&caught(this.member(this.dennerId).position,this.member(this.runnerId).position)) {
       this.catchRunner('Caught!');
       return;
     }
     // Tag check: Denner can also tag any Spectator who is OUT of Safe Zone!
-    if(this.phase==='chase'&&this.dennerId){
+    if(this.phase==='chase'&&this.dennerId&&!this.isInsideSafeZone(this.member(this.dennerId).position,now)){
       const dennerPos = this.member(this.dennerId).position;
       for(const p of this.members.values()){
         if(p.id!==this.dennerId && p.id!==this.runnerId && p.connected && now>=this.member(this.runnerId!).catchGraceUntil && !this.isPlayerSafe(p,now)){
@@ -211,7 +228,7 @@ export class Game {
     }
   }
 
-  nextRound(){this.computers.reset();this.pendingKnock=null;this.speech=null;this.phase='category';this.category=null;this.runnerId=null;this.relayDeadline=null;this.safeZones=[];this.bluffSignals=[];this.message=`${this.member(this.dennerId!).name} is the new DENNER. Pick a category!`;for(const p of this.members.values()){p.identity=null;p.position=this.spawnPosition(p.id);p.input={seq:p.lastSeq,dx:0,dz:0,sprint:false}}}
+  nextRound(){this.computers.reset();this.pendingKnock=null;this.speech=null;this.phase='category';this.category=null;this.runnerId=null;this.relayDeadline=null;this.safeZones=[];this.bluffSignals=[];this.message=`${this.member(this.dennerId!).name} is the new DENNER. Pick a category!`;for(const p of this.members.values()){p.identity=null;p.freezeUntil=0;p.position=this.spawnPosition(p.id);p.input={seq:p.lastSeq,dx:0,dz:0,sprint:false}}}
 
   catchRunner(reason:string){if(!this.runnerId)return;const runner=this.member(this.runnerId);this.dennerId=this.runnerId;this.runnerId=null;this.relayDeadline=null;for(const p of this.members.values()){p.role=p.id===this.dennerId?'denner':'other';p.input={seq:p.lastSeq,dx:0,dz:0,sprint:false}}this.phase='caught';this.message=`${reason} ${runner.name} is the new DENNER.`;this.transitionAt=Date.now()+3500}
 
@@ -234,13 +251,11 @@ export class Game {
 
   isPlayerSafe(p:Member,now=Date.now()):boolean{
     if(p.id===this.dennerId) return false;
-    for(const sz of this.safeZones){
-      const dist = Math.hypot(p.position.x-sz.x, p.position.z-sz.z);
-      if(now<sz.expiresAt&&dist <= sz.radius){
-        return true;
-      }
-    }
-    return false;
+    return this.isInsideSafeZone(p.position,now);
+  }
+
+  isInsideSafeZone(position:Vec,now=Date.now()):boolean{
+    return this.safeZones.some(zone=>now<zone.expiresAt&&Math.hypot(position.x-zone.x,position.z-zone.z)<=zone.radius);
   }
 
   spawnPosition(id:string){const index=[...this.members.keys()].indexOf(id);const angle=index/this.members.size*Math.PI*2;return {x:Math.sin(angle)*5,z:Math.cos(angle)*5}}
@@ -258,6 +273,7 @@ export class Game {
       speech:this.speech,
       serverTime:Date.now(),
       relayDeadline:this.relayDeadline,
+      powerup:this.phase==='chase'?{x:0,z:0,availableAt:this.powerupAvailableAt}:null,
       chaseStartsAt:this.runnerId?this.chaseStartsAt:null,
       safeZones:this.safeZones,
       bluffSignals:this.bluffSignals,

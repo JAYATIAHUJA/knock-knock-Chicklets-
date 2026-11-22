@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import {type Player,type PublicRoom} from '@chicklets/shared';
 import {Controls} from './Controls';
 import {getPixelDpr} from './pixel-render';
+import {serverNow} from './serverClock';
 
 function ThirdPersonCamera({player}:{player:Player|undefined}){
  const focus=useRef(new THREE.Vector3(player?.position.x||0,1.6,player?.position.z||0));
@@ -34,6 +35,14 @@ function SafeZoneMarkers({room}:{room:PublicRoom}){
  </mesh></group>)}</group>;
 }
 
+function FreezePickup({room}:{room:PublicRoom}){
+ if(room.phase!=='chase'||!room.powerup||serverNow()<room.powerup.availableAt)return null;
+ return <group position={[room.powerup.x,0,room.powerup.z]}>
+  <mesh position={[0,.12,0]} rotation={[-Math.PI/2,0,0]}><ringGeometry args={[.55,.95,32]}/><meshBasicMaterial color="#8c4bc2" side={THREE.DoubleSide}/></mesh>
+  <Html center position={[0,1.25,0]} distanceFactor={8} style={{pointerEvents:'none'}}><span className="freeze-sign">FREEZE</span></Html>
+ </group>;
+}
+
 export function Scene({room,id}:{room:PublicRoom;id:string}) {
  const player=room.players.find(p=>p.id===id);
  const {active}=useProgress();
@@ -46,6 +55,7 @@ export function Scene({room,id}:{room:PublicRoom;id:string}) {
      <World/>
 
      <SafeZoneMarkers room={room}/>
+     <FreezePickup room={room}/>
      {room.players.map(p=><Avatar chasing={room.phase==='chase'} key={p.id} player={p} local={p.id===id} speech={room.speech?.playerId===p.id?room.speech:null}/>)}
     </Suspense>
     <ThirdPersonCamera player={player}/>
