@@ -5,9 +5,16 @@ import type {PublicRoom} from '@chicklets/shared';
 import {PhaseChoices} from './PhaseChoices';
 import {KnockPlay} from './KnockPlay';
 import {RunnerTracker} from './RunnerTracker';
+import {LobbyStage} from './LobbyStage';
 
 const room:PublicRoom={code:'TEST01',phase:'category',category:'Fruits',players:[],dennerId:'denner',runnerId:'runner',message:'',minPlayers:3,knock:null,speech:null};
 const act=async()=>{};
+
+test('lobby readiness and roster appear together in the central choice stage',()=>{
+ const lobby={...room,phase:'lobby' as const,players:[{id:'denner',name:'You',position:{x:0,z:0},color:'#123456',ready:false,connected:true,role:'other' as const,stamina:100}]};
+ const html=renderToStaticMarkup(<LobbyStage room={lobby} id="denner" onReady={()=>{}}/>);
+ assert.match(html,/phase-choice-stage lobby-stage/);assert.match(html,/Gather the gang/);assert.match(html,/I’M READY/);assert.match(html,/You \(you\)/);
+});
 
 test('Denner sees the current runner and direction throughout the chase',()=>{
  const chase={...room,phase:'chase' as const,players:[{id:'denner',name:'You',position:{x:0,z:0},color:'#123456',ready:true,connected:true,role:'denner' as const,stamina:100},{id:'runner',name:'Chintu',position:{x:10,z:0},color:'#123456',ready:true,connected:true,role:'runner' as const,stamina:100}]};

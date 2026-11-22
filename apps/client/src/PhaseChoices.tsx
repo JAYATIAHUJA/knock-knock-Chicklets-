@@ -7,7 +7,7 @@ export function PhaseChoices({room,id,identity,act}:Props){
  const denner=room.dennerId===id;
  const choosing=room.phase==='category'?denner:!denner&&!identity;
  const title=room.phase==='category'?(denner?'Choose a category':'The Denner is choosing'):
-  denner?'Players are choosing their secrets':identity?'Your secret is ready':`Choose your secret ${room.category?.toLowerCase()}`;
+  denner?'Players are choosing their secrets':identity?'Your secret is ready':`Choose a secret from ${room.category}`;
  const names=room.phase==='category'?Object.keys(CATEGORIES):room.category?CATEGORIES[room.category]:[];
  return <div className="phase-choice-stage">
   <section className="phase-choice-card" aria-labelledby="phase-choice-title">

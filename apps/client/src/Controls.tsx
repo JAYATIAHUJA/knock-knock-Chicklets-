@@ -65,9 +65,9 @@ export function Controls({room,id}:{room:PublicRoom;id:string}){
     </div>
    </div>}
   </div>
-  <div className="touch-controls">
+  {allowed&&<div className="touch-controls">
    <div className="dpad">{button('w','↑','up')}{button('a','←','left')}{button('s','↓','down')}{button('d','→','right')}</div>
    {button('shift','RUN','run')}
-  </div>
+  </div>}
  </>;
 }

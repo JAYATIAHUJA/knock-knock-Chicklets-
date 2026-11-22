@@ -132,6 +132,18 @@ html,body,#root{max-width:100%;overflow-x:hidden}
  .in-game .round-guide{top:72px!important;max-height:calc(100dvh - 230px)}
 }
 .in-game.phase-chase .round-guide{left:20px!important;top:100px!important;bottom:auto!important;transform:none!important;width:230px}
+.lobby-stage .phase-choice-card{width:min(500px,100%)}
+.lobby-roster{display:grid;gap:7px;margin:18px 0;max-height:36vh;overflow:auto}
+.lobby-roster>div{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff9e9;border:1px solid #d8bd90;font-size:14px;font-weight:700}
+.lobby-roster strong{margin-left:auto;font-size:10px;letter-spacing:.07em;color:#826244}
+.lobby-ready{width:100%;min-height:52px;font-size:17px}
+.phase-lobby .controls,.phase-category .controls,.phase-identity .controls,.phase-knock .controls,.phase-caught .controls{display:none!important}
+.in-game.phase-guessing .round-guide{width:min(330px,calc(100vw - 24px));padding:9px 13px;top:84px!important}
+.in-game.phase-guessing .round-guide h2{font-size:17px;margin:0 0 2px}
+.in-game.phase-guessing .round-guide p{font-size:11px;line-height:1.25}
+.in-game.phase-guessing .practice-tip,.in-game.phase-guessing .secret-reminder small{display:none}
+.in-game.phase-guessing .secret-reminder{margin-top:5px;padding:4px 8px;display:flex;align-items:center;justify-content:center;gap:7px}
+.in-game.phase-guessing .secret-reminder strong{font-size:16px}
 @media(max-width:600px){
  .in-game.phase-chase .round-guide{left:8px!important;top:auto!important;bottom:100px!important;width:min(205px,60vw)}
  .in-game.phase-chase .round-guide .practice-tip{display:none}

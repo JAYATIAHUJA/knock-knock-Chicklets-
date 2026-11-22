@@ -9,6 +9,7 @@ import {Landing} from './Landing';
 import {PhaseChoices} from './PhaseChoices';
 import {RoundRecap} from './RoundRecap';
 import {RunnerTracker} from './RunnerTracker';
+import {LobbyStage} from './LobbyStage';
 import {sounds} from './sound';
 
 const colors=['#db7857','#6b9b78','#d4a047','#8296bd','#ae82a6','#79aeb2'];
@@ -136,7 +137,7 @@ export default function App(){
   {!room?<Landing onPlay={()=>void enter('create')}>
    <div className="join-card">
     <label>Your nickname<input maxLength={20} value={name} onChange={e=>setName(e.target.value)} placeholder="e.g. Chintu"/></label>
-    <details className="room-settings"><summary>Room settings</summary>
+    <details className="room-settings" open><summary>Room settings</summary>
     <div className="color-label">Pick your colour</div>
     <div className="swatches">{colors.map(c=><button aria-label={`Choose ${c}`} className={c===color?'selected':''} style={{background:c}} onClick={()=>setColor(c)} key={c}/>)}</div>
     <fieldset className="play-mode">
@@ -161,24 +162,12 @@ export default function App(){
     <Scene room={room} id={playerId}/>
     <RunnerTracker room={room} id={playerId}/>
     {room.phase==='guessing'&&room.message.startsWith('Wrong guess')&&<div className="guess-result" role="status">{room.message}</div>}
-    {(room.phase==='lobby'||room.phase==='guessing'||(room.phase==='chase'&&room.runnerId!==playerId))&&!guessTarget&&<RoundGuide room={room} id={playerId} identity={identity}/>}
+    {(room.phase==='guessing'||(room.phase==='chase'&&room.runnerId!==playerId))&&!guessTarget&&<RoundGuide room={room} id={playerId} identity={identity}/>}
     {room.phase==='guessing'&&isDenner&&nearby[0]&&!guessTarget&&<button className="nearby-knock" onClick={()=>setGuessTarget(nearby[0].id)}>Knock on {nearby[0].name} <kbd>E / Space</kbd></button>}
    </section>
-   {room.phase==='lobby'&&<aside className="sidebar">
-    <div className="side-heading">
-     <span>THE COURTYARD</span>
-     <h2>{room.phase==='lobby'?'Gather the gang':room.phase==='chase'?'Run, run, run!':room.phase==='caught'?'Caught!':'The game is on'}</h2>
-     <p>{room.phase==='lobby'?`Everyone ready? ${room.minPlayers} players needed to start.`:room.phase==='identity'?'Your choice is yours alone. The DENNER cannot see it.':room.phase==='guessing'?'DENNER walks up to a friend and guesses their secret.':room.phase==='chase'?'Runner: call a secret. Everyone else: reach a safe spot.':room.message}</p>
-    </div>
-    <div className="player-list">
-     <div className="section-title">PLAYERS <span>{room.players.length}/8</span></div>
-     {room.players.map(p=><div key={p.id} className={`player-row ${p.connected?'':'offline'}`}><span className="player-dot" style={{background:p.color}}/><span>{p.name}{p.bot?' · computer':p.id===playerId?' (you)':''}</span><small>{!p.connected?'RECONNECTING':room.phase==='lobby'?(p.ready?'READY':'WAITING'):p.role==='denner'?'DENNER':p.role==='runner'?'RUNNER':'PLAYER'}</small></div>)}
-    </div>
-    {room.phase==='lobby'&&<button className="primary wide" onClick={()=>act('ready',!me?.ready)}>{me?.ready?'CANCEL READY':'I\'M READY'}</button>}
-    <div className="side-bottom">WASD / ARROWS TO MOVE · SHIFT TO SPRINT<br/>Made for friends, shared screens, and old streets.</div>
-   </aside>}
   </main>}
 
+  {room&&<LobbyStage room={room} id={playerId} onReady={()=>void act('ready',!me?.ready)}/>}
   {room&&<PhaseChoices room={room} id={playerId} identity={identity} act={act}/>}
   {room&&<KnockPlay room={room} id={playerId} callNames={callNames} act={act}/>}
 
