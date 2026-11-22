@@ -50,7 +50,7 @@ export function Scene({room,id}:{room:PublicRoom;id:string}) {
     </Suspense>
     <ThirdPersonCamera player={player}/>
    </Canvas>
-   {active&&<div className="world-loading" role="status">Loading the courtyard…</div>}
+   {active&&<div className="world-loading" role="status"><span>CHICKLETS</span><strong>Opening the courtyard</strong><i aria-hidden="true"/></div>}
   </div>
   <Controls room={room} id={id}/>
  </>;

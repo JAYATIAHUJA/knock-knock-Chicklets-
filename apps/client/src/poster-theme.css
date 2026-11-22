@@ -123,6 +123,23 @@ html,body,#root{max-width:100%;overflow-x:hidden}
  .in-game .shout-options{grid-template-columns:repeat(2,minmax(0,1fr))}
  .in-game .round-guide{max-height:calc(100dvh - 270px);overflow:auto}
 }
+/* The shutters open onto the same courtyard used by the landing art. */
+.intro-scene{position:absolute;inset:0;z-index:1;background:#854532 url('./assets/mohalla-menu.webp') center 56%/cover no-repeat;opacity:.72;transform:scale(1.055);transition:transform 1.5s ease,opacity .5s ease}
+.intro-scene::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,#330c25b8 0%,#330c2530 38%,#330c2588 100%)}
+.intro-reveal .intro-scene{opacity:1;transform:scale(1)}
+.intro-curtain .curtain-vignette{z-index:4;background:radial-gradient(ellipse at 50% 48%,transparent 34%,#250b22a8 100%)}
+.intro-curtain .intro-title-lockup{width:max-content;max-width:calc(100vw - 32px);padding:20px clamp(20px,4vw,50px);background:#4b0e32e8;border:3px solid #ffca16;box-shadow:9px 9px 0 #24091db0;text-align:center}
+.intro-curtain .intro-title-lockup strong{font-size:clamp(40px,8.5vw,108px);line-height:.98;color:#ffca16;text-shadow:3px 4px 0 #280d23;white-space:nowrap}
+.intro-curtain .intro-overline{font-size:clamp(10px,1vw,14px);letter-spacing:.32em}
+.intro-curtain .intro-hindi{margin-top:9px;color:#fff0c8;font:700 clamp(12px,1.6vw,17px)/1.3 'DM Sans',sans-serif;letter-spacing:.02em}
+.intro-curtain .skip-intro-btn{bottom:20px;right:20px;padding:10px 14px;border:2px solid #2a1026;border-radius:4px;box-shadow:3px 3px 0 #220b1b}
+.world-loading{z-index:8;display:grid;gap:7px;justify-items:center;width:min(330px,calc(100% - 32px));padding:24px;background:#4b0e32;color:#fff0c8;border:3px solid #ffca16;border-radius:4px;box-shadow:7px 7px 0 #230a1ea8;text-align:center;white-space:normal}
+.world-loading span{color:#ffca16;font:900 26px/1 'Lilita One','Baloo 2',sans-serif;letter-spacing:.05em}
+.world-loading strong{font:700 13px/1.4 'DM Sans',sans-serif}
+.world-loading i{display:block;width:100%;height:4px;margin-top:8px;background:linear-gradient(90deg,#ffca16 0 35%,#ffffff55 35% 100%);background-size:240% 100%;animation:world-loading-sweep 1.4s ease-in-out infinite alternate}
+@keyframes world-loading-sweep{to{background-position:100% 0}}
+@media(max-width:600px){.intro-curtain .intro-title-lockup{padding:17px 18px}.intro-curtain .intro-title-lockup strong{font-size:clamp(33px,10.3vw,58px)}.intro-curtain .intro-hindi{font-size:12px}.intro-scene{background-position:48% center}}
+@media(prefers-reduced-motion:reduce){.intro-scene,.world-loading i{transition:none;animation:none}}
 @media(max-height:500px){
  .phase-choice-stage{padding:65px 12px 12px}
  .in-game .shout-panel{top:70px;width:min(460px,calc(100vw - 330px));max-height:calc(100dvh - 90px)}

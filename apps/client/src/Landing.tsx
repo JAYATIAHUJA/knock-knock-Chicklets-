@@ -2,7 +2,7 @@ import {useEffect,useRef,useState,type ReactNode} from 'react';
 import './landing.css';
 import {sounds} from './sound';
 
-const PRELOADER_DURATION=3000;
+const PRELOADER_DURATION=2600;
 
 export function Landing({children,onPlay}:{children:ReactNode;onPlay:()=>void}){
  const [loaded,setLoaded]=useState(()=>{
@@ -30,9 +30,9 @@ export function Landing({children,onPlay}:{children:ReactNode;onPlay:()=>void}){
 
   const t2=setTimeout(()=>{
     setAnimStep('reveal');
-  },1250);
+  },1050);
 
-  const t3=setTimeout(()=>setAnimStep('exit'),2450);
+  const t3=setTimeout(()=>setAnimStep('exit'),2150);
 
   const t4=setTimeout(()=>{
     finishIntro();
@@ -59,9 +59,10 @@ export function Landing({children,onPlay}:{children:ReactNode;onPlay:()=>void}){
       ══════════════════════════════════════════════ */}
   {!loaded&&(
    <aside role="dialog" aria-modal="true" className={`intro-curtain intro-${animStep}`} aria-label="Game introduction">
+    <div className="intro-scene" aria-hidden="true"/>
     <div className="curtain-vignette"/>
-    <div className="intro-door door-left"><img className="shutter-hand" alt="" src="/art/knocking-hand.png"/><span>LANE 04</span></div>
-    <div className="intro-door door-right"><img className="shutter-hand" alt="" src="/art/knocking-hand.png"/><span>KNOCK HERE</span></div>
+    <div className="intro-door door-left"><img className="shutter-hand" alt="" src="/art/knocking-hand.webp"/><span>LANE 04</span></div>
+    <div className="intro-door door-right"><img className="shutter-hand" alt="" src="/art/knocking-hand.webp"/><span>KNOCK HERE</span></div>
     <div className="curtain-stage">
       <div className={`knock-fx ${animStep}`}>
         <span className="knock-word"><i>Knock</i><i>Knock</i></span>
@@ -69,7 +70,7 @@ export function Landing({children,onPlay}:{children:ReactNode;onPlay:()=>void}){
         <div className="knock-wave-ring delayed"/>
       </div>
       <div className={`intro-hand ${animStep}`}>
-        <img src="/art/knocking-hand.png" alt="Knocking hand" draggable="false"/>
+        <img src="/art/knocking-hand.webp" alt="Knocking hand" draggable="false"/>
       </div>
       <div className="intro-title-lockup" aria-label="Knock knock Chicklets">
        <span className="intro-overline">KNOCK · KNOCK</span>

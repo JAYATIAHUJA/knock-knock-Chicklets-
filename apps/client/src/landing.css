@@ -502,7 +502,7 @@
 }
 
 /* Pixel-mohalla surfaces */
-.gali-demo{position:relative;isolation:isolate;overflow:hidden;min-height:240px;border:4px solid #102530;background:#c9894c url('./assets/mohalla-menu.png') center 65%/cover;box-shadow:5px 6px #101f28}
+.gali-demo{position:relative;isolation:isolate;overflow:hidden;min-height:240px;border:4px solid #102530;background:#c9894c url('./assets/mohalla-menu.webp') center 65%/cover;box-shadow:5px 6px #101f28}
 .gali-dialogue{position:absolute;z-index:2;top:15px;left:4%;max-width:92%;padding:10px 17px;color:#162d34;background:#fff5d6;border:3px solid;box-shadow:4px 4px #162d34;transform:rotate(-3deg)}
 .gali-dialogue small,.gali-dialogue strong{display:block}.gali-dialogue small{font:800 10px/1.4 monospace;letter-spacing:.1em}.gali-dialogue strong,.knock-card h2.gali-question{font:400 clamp(25px,3vw,45px)/1.15 'Lilita One',system-ui}
 .beat-2 .gali-dialogue{left:auto;right:5%;background:#ffcc50;transform:rotate(3deg)}
@@ -519,7 +519,7 @@
 .arcade-cover{width:100%;position:relative}
 .arcade-cover h2{font:400 clamp(48px,6.5vw,100px)/.92 'Lilita One',system-ui;margin:0 0 -.12em;position:relative;z-index:1;letter-spacing:-.045em;text-shadow:4px 5px #142631;transform:rotate(-3deg)}
 .arcade-cover h2 em{color:#ffc758;font-style:normal}
-.street-strip{height:clamp(145px,23vh,280px);background:#ae8065 url('./assets/mohalla-menu.png') center 55%/cover;border:4px solid #101f28;position:relative;box-shadow:5px 5px #101f28;transform:rotate(-1deg)}
+.street-strip{height:clamp(145px,23vh,280px);background:#ae8065 url('./assets/mohalla-menu.webp') center 55%/cover;border:4px solid #101f28;position:relative;box-shadow:5px 5px #101f28;transform:rotate(-1deg)}
 .street-strip b,.street-strip i{position:absolute;font:700 20px 'Baloo 2',sans-serif;color:#172c34;background:#fff2cd;padding:3px 15px;border:2px solid;border-radius:16px 16px 2px 16px;left:12%;bottom:15%;transform:rotate(-6deg)}
 .street-strip i{left:auto;right:8%;bottom:52%;background:#ffbe47;transform:rotate(8deg)}
 .rulebook{margin-top:22px;font:500 15px/1.55 'DM Sans',sans-serif}.rulebook summary{cursor:pointer;font-weight:700;text-decoration:underline;text-underline-offset:5px;padding:10px 0}.rulebook li{margin:9px 0}.rulebook strong{color:#ffd47a}
