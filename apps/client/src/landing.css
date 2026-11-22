@@ -393,6 +393,48 @@
   margin: 8px 0 4px;
 }
 
+.character-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 5px 0 10px;
+}
+
+.character-choices button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 3px 6px;
+  border: 2px solid #cdb58d;
+  border-radius: 6px;
+  background: #fffaf0;
+  color: #1c3228;
+  text-transform: capitalize;
+  font-size: 11px;
+}
+
+.character-choices button.selected {
+  border-color: #b91c1c;
+  background: #fff0db;
+  box-shadow: 0 0 0 2px #b91c1c25;
+}
+
+.character-choices button:focus-visible {
+  outline: 3px solid #1c3228;
+  outline-offset: 2px;
+}
+
+.character-portrait {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  background-size: 400% 400%;
+  background-position: left top;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
 .adda-form-container .swatches {
   margin-bottom: 10px;
 }

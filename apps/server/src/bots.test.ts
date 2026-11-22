@@ -5,6 +5,7 @@ import {Game} from './game.js';
 test('computer friends are ready, marked publicly, and do not expose secrets',()=>{
  const g=new Game(3);g.add('human','You','#123456');g.addBots(2);
  assert.equal(g.members.size,3);assert.equal(g.public().players.filter(p=>p.bot&&p.ready).length,2);
+ assert.deepEqual(g.public().players.filter(p=>p.bot).map(p=>p.avatar),['chintu','gudiya']);
  assert.throws(()=>g.addBots(9));assert.equal(g.members.size,3);
  g.ready('human',true);assert.equal(g.phase,'category');
  assert.ok(!JSON.stringify(g.public()).includes('identity'));

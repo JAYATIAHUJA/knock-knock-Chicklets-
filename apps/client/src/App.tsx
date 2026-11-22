@@ -1,5 +1,5 @@
 import {useEffect,useState,useRef} from 'react';
-import {CATEGORIES} from '@chicklets/shared';
+import {CATEGORIES,type AvatarChoice} from '@chicklets/shared';
 import {socket,send,saveSession} from './network';
 import {useGame} from './store';
 import {Scene} from './scene';
@@ -13,11 +13,13 @@ import {LobbyStage} from './LobbyStage';
 import {sounds} from './sound';
 
 const colors=['#db7857','#6b9b78','#d4a047','#8296bd','#ae82a6','#79aeb2'];
+const characters:AvatarChoice[]=['chintu','gudiya','bunty'];
 
 export default function App(){
  const {room,playerId,identity,callNames,error,setError}=useGame();
  const [name,setName]=useState(localStorage.getItem('chicklets-name')||'Rookie');
  const [color,setColor]=useState(colors[0]);
+ const [avatar,setAvatar]=useState<AvatarChoice>(()=>{const saved=localStorage.getItem('chicklets-avatar');return characters.find(choice=>choice===saved)??'chintu'});
  const [code,setCode]=useState(new URLSearchParams(location.search).get('room')||'');
  const [dev,setDev]=useState(false);
  const [bots,setBots]=useState(2);
@@ -102,7 +104,8 @@ export default function App(){
   try{
    setError('');
    localStorage.setItem('chicklets-name',name);
-   const session=await send(kind,kind==='create'?{name,color,dev,bots}:{name,color,code:code.trim().toUpperCase()}) as {code:string;token:string;playerId:string};
+   localStorage.setItem('chicklets-avatar',avatar);
+   const session=await send(kind,kind==='create'?{name,color,avatar,dev,bots}:{name,color,avatar,code:code.trim().toUpperCase()}) as {code:string;token:string;playerId:string};
    saveSession(session);
    if(kind==='create'&&bots>0&&!waitForFriends)await send('ready',true);
    if(kind==='create'){history.replaceState(null,'',`?room=${session.code}`);setCode(session.code)}
@@ -138,6 +141,8 @@ export default function App(){
    <div className="join-card">
     <label>Your nickname<input maxLength={20} value={name} onChange={e=>setName(e.target.value)} placeholder="e.g. Chintu"/></label>
     <details className="room-settings" open><summary>Room settings</summary>
+    <div className="color-label">Pick your character</div>
+    <div className="character-choices">{characters.map(choice=><button key={choice} type="button" aria-label={`Choose ${choice}`} aria-pressed={avatar===choice} className={avatar===choice?'selected':''} onClick={()=>setAvatar(choice)}><span className="character-portrait" style={{backgroundImage:`url(/characters/${choice}.webp)`}}/><strong>{choice}</strong></button>)}</div>
     <div className="color-label">Pick your colour</div>
     <div className="swatches">{colors.map(c=><button aria-label={`Choose ${c}`} className={c===color?'selected':''} style={{background:c}} onClick={()=>setColor(c)} key={c}/>)}</div>
     <fieldset className="play-mode">

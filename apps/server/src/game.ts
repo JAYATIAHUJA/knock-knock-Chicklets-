@@ -1,7 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import {ComputerFriends} from './bots.js';
 
-import { ARENA,CATEGORIES,canMove,caught,chooseDenner,stepMotion,outside,RELAY_LIMIT_MS,SAFE_ZONE_DURATION_MS,RUNNER_HEAD_START_MS,type PrivateState,type Category,type Input,type Player,type PublicRoom,type SafeZone,type Vec } from '@chicklets/shared';
+import { ARENA,CATEGORIES,canMove,caught,chooseDenner,stepMotion,outside,RELAY_LIMIT_MS,SAFE_ZONE_DURATION_MS,RUNNER_HEAD_START_MS,type AvatarChoice,type PrivateState,type Category,type Input,type Player,type PublicRoom,type SafeZone,type Vec } from '@chicklets/shared';
 
 
 
@@ -11,7 +11,7 @@ export class Game {
 
   computers=new ComputerFriends();
 
-  addBots(count:number){if(this.phase!=='lobby'||!Number.isInteger(count)||count<0||count>3||this.members.size+count>8)throw Error('Choose up to 3 computer friends in the lobby');for(let i=0;i<count;i++){const id=`bot-${randomBytes(6).toString('hex')}`;this.add(id,['Chintu','Gudiya','Bunty'][i],['#6b9b78','#d4a047','#8296bd'][i]);const p=this.member(id);p.bot=true;p.ready=true}}
+  addBots(count:number){if(this.phase!=='lobby'||!Number.isInteger(count)||count<0||count>3||this.members.size+count>8)throw Error('Choose up to 3 computer friends in the lobby');for(let i=0;i<count;i++){const id=`bot-${randomBytes(6).toString('hex')}`;this.add(id,['Chintu','Gudiya','Bunty'][i],['#6b9b78','#d4a047','#8296bd'][i],(['chintu','gudiya','bunty'] as AvatarChoice[])[i]);const p=this.member(id);p.bot=true;p.ready=true}}
 
   code:string; members=new Map<string,Member>(); phase:PublicRoom['phase']='lobby'; category:Category|null=null; dennerId:string|null=null; runnerId:string|null=null; message='Gather your friends in the courtyard'; minPlayers:number; transitionAt=0; relayDeadline:number|null=null; chaseStartsAt=0; powerupAvailableAt=0; safeZones:SafeZone[]=[]; safeZoneNextRotationAt=0; bluffSignals:PublicRoom['bluffSignals']=[];
 
@@ -19,7 +19,7 @@ export class Game {
 
   constructor(minPlayers=5,code=randomBytes(3).toString('hex').toUpperCase()){this.minPlayers=minPlayers;this.code=code}
 
-  add(id:string,name:string,color:string){if(this.phase!=='lobby')throw Error('Round already started');if(this.members.size>=8)throw Error('Room is full');if(!name.trim()||name.length>20)throw Error('Name must be 1â€“20 characters');if(!/^#[0-9a-fA-F]{6}$/.test(color))throw Error('Invalid colour');const n=this.members.size;this.members.set(id,{id,name:name.trim(),color,stamina:100,catchGraceUntil:0,freezeUntil:0,ready:false,connected:true,position:{x:(n%4-1.5)*2.2,z:Math.floor(n/4)*2.2},role:'other',identity:null,input:{seq:0,dx:0,dz:0,sprint:false},velocity:{x:0,z:0},lastSeq:0,lastInputAt:0});return this.public()}
+  add(id:string,name:string,color:string,avatar?:AvatarChoice){if(this.phase!=='lobby')throw Error('Round already started');if(this.members.size>=8)throw Error('Room is full');if(!name.trim()||name.length>20)throw Error('Name must be 1â€“20 characters');if(!/^#[0-9a-fA-F]{6}$/.test(color))throw Error('Invalid colour');if(avatar!==undefined&&!(['chintu','gudiya','bunty'] as string[]).includes(avatar))throw Error('Invalid character');const n=this.members.size;this.members.set(id,{id,name:name.trim(),color,avatar,stamina:100,catchGraceUntil:0,freezeUntil:0,ready:false,connected:true,position:{x:(n%4-1.5)*2.2,z:Math.floor(n/4)*2.2},role:'other',identity:null,input:{seq:0,dx:0,dz:0,sprint:false},velocity:{x:0,z:0},lastSeq:0,lastInputAt:0});return this.public()}
 
   remove(id:string){const wasDenner=id===this.dennerId,wasRunner=id===this.runnerId;this.members.delete(id);if(this.members.size<this.minPlayers){this.reset('Waiting for more players');return}if(wasDenner||wasRunner||this.phase==='identity'||this.phase==='knock'||this.phase==='caught'){this.reset('A player left. Ready up for a new round.')}else if(this.phase==='guessing'&&this.members.size-1===0){this.reset('Waiting for more players')} }
 
