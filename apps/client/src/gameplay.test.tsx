@@ -4,9 +4,17 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import type {PublicRoom} from '@chicklets/shared';
 import {PhaseChoices} from './PhaseChoices';
 import {KnockPlay} from './KnockPlay';
+import {RunnerTracker} from './RunnerTracker';
 
 const room:PublicRoom={code:'TEST01',phase:'category',category:'Fruits',players:[],dennerId:'denner',runnerId:'runner',message:'',minPlayers:3,knock:null,speech:null};
 const act=async()=>{};
+
+test('Denner sees the current runner and direction throughout the chase',()=>{
+ const chase={...room,phase:'chase' as const,players:[{id:'denner',name:'You',position:{x:0,z:0},color:'#123456',ready:true,connected:true,role:'denner' as const,stamina:100},{id:'runner',name:'Chintu',position:{x:10,z:0},color:'#123456',ready:true,connected:true,role:'runner' as const,stamina:100}]};
+ const hud=renderToStaticMarkup(<RunnerTracker room={chase} id="denner"/>);
+ assert.match(hud,/Chintu/);assert.match(hud,/10m away/);assert.match(hud,/rotate\(90deg\)/);
+ assert.equal(renderToStaticMarkup(<RunnerTracker room={chase} id="runner"/>),'');
+});
 
 test('category and identity choices occupy one contextual surface',()=>{
  const category=renderToStaticMarkup(<PhaseChoices room={room} id="denner" identity={null} act={act}/>);

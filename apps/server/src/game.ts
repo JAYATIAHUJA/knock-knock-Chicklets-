@@ -13,7 +13,7 @@ export class Game {
 
   addBots(count:number){if(this.phase!=='lobby'||!Number.isInteger(count)||count<0||count>3||this.members.size+count>8)throw Error('Choose up to 3 computer friends in the lobby');for(let i=0;i<count;i++){const id=`bot-${randomBytes(6).toString('hex')}`;this.add(id,['Chintu','Gudiya','Bunty'][i],['#6b9b78','#d4a047','#8296bd'][i]);const p=this.member(id);p.bot=true;p.ready=true}}
 
-  code:string; members=new Map<string,Member>(); phase:PublicRoom['phase']='lobby'; category:Category|null=null; dennerId:string|null=null; runnerId:string|null=null; message='Gather your friends in the courtyard'; minPlayers:number; transitionAt=0; relayDeadline:number|null=null; safeZones:SafeZone[]=[]; safeZoneNextRotationAt=0; bluffSignals:PublicRoom['bluffSignals']=[];
+  code:string; members=new Map<string,Member>(); phase:PublicRoom['phase']='lobby'; category:Category|null=null; dennerId:string|null=null; runnerId:string|null=null; message='Gather your friends in the courtyard'; minPlayers:number; transitionAt=0; relayDeadline:number|null=null; chaseStartsAt=0; safeZones:SafeZone[]=[]; safeZoneNextRotationAt=0; bluffSignals:PublicRoom['bluffSignals']=[];
 
   pendingKnock:PublicRoom['knock']=null; speech:PublicRoom['speech']=null;
 
@@ -46,6 +46,7 @@ export class Game {
     }
     this.runnerId=targetId;
     target.role='runner';target.catchGraceUntil=Date.now()+RUNNER_HEAD_START_MS;
+    this.chaseStartsAt=target.catchGraceUntil;
     this.phase='chase';
     this.relayDeadline=Date.now()+RELAY_LIMIT_MS;
     this.generateSafeZones(Date.now());
@@ -142,7 +143,7 @@ export class Game {
 
   }
 
-  input(id:string,input:Input){const p=this.member(id),now=Date.now();if(!p.connected||!canMove(this.phase,id,this.dennerId,this.runnerId,this.runnerId?this.member(this.runnerId).catchGraceUntil:0,now))return false;if(!Number.isInteger(input.seq)||input.seq<=p.lastSeq||!Number.isFinite(input.dx)||!Number.isFinite(input.dz)||Math.abs(input.dx)>1||Math.abs(input.dz)>1||typeof input.sprint!=='boolean')return false;if(now-p.lastInputAt<12)return false;p.lastInputAt=now;p.lastSeq=input.seq;p.input=input;return true}
+  input(id:string,input:Input){const p=this.member(id),now=Date.now();if(!p.connected||!canMove(this.phase,id,this.dennerId,this.runnerId,this.chaseStartsAt,now))return false;if(!Number.isInteger(input.seq)||input.seq<=p.lastSeq||!Number.isFinite(input.dx)||!Number.isFinite(input.dz)||Math.abs(input.dx)>1||Math.abs(input.dz)>1||typeof input.sprint!=='boolean')return false;if(now-p.lastInputAt<12)return false;p.lastInputAt=now;p.lastSeq=input.seq;p.input=input;return true}
 
   tick(now=Date.now()){
     this.computers.tick(this,now);
@@ -157,7 +158,7 @@ export class Game {
       return;
     }
     for(const p of this.members.values()){
-      if(!p.connected||!canMove(this.phase,p.id,this.dennerId,this.runnerId,this.runnerId?this.member(this.runnerId).catchGraceUntil:0,now)){
+      if(!p.connected||!canMove(this.phase,p.id,this.dennerId,this.runnerId,this.chaseStartsAt,now)){
         p.velocity={x:0,z:0};
         continue;
       }
@@ -256,7 +257,7 @@ export class Game {
       knock:this.pendingKnock,
       speech:this.speech,
       relayDeadline:this.relayDeadline,
-      chaseStartsAt:this.runnerId?this.member(this.runnerId).catchGraceUntil:null,
+      chaseStartsAt:this.runnerId?this.chaseStartsAt:null,
       safeZones:this.safeZones,
       bluffSignals:this.bluffSignals,
       players:[...this.members.values()].map(({identity,input,lastInputAt,...p})=>p)

@@ -114,7 +114,7 @@ export function Landing({children,onPlay}:{children:ReactNode;onPlay:()=>void}){
       <details className="rulebook"><summary>How to play</summary>
        <ol><li><strong>Pick a secret.</strong> The Denner picks a category. If it’s cars, each player secretly picks a different car.</li>
        <li><strong>Call their bluff.</strong> The Denner taps someone and guesses their name. They get a comeback. A correct guess starts the chase.</li>
-       <li><strong>BMW!</strong> Call one of the shown names within 20 seconds and its owner runs next. Each runner gets a head start while the Denner waits. Active safe spots protect everyone from tags. A timeout, tag outside safety or boundary crossing puts you out.</li></ol>
+       <li><strong>BMW!</strong> Call one of the shown names within 20 seconds and its owner runs next. The first runner gets a head start; relays briefly protect the next runner while the chase continues. Active safe spots protect everyone from tags. A timeout, tag outside safety or boundary crossing puts you out.</li></ol>
       </details>
      </div>
     </section>

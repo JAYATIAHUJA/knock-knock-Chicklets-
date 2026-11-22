@@ -8,6 +8,7 @@ import {KnockPlay} from './KnockPlay';
 import {Landing} from './Landing';
 import {PhaseChoices} from './PhaseChoices';
 import {RoundRecap} from './RoundRecap';
+import {RunnerTracker} from './RunnerTracker';
 import {sounds} from './sound';
 
 const colors=['#db7857','#6b9b78','#d4a047','#8296bd','#ae82a6','#79aeb2'];
@@ -158,6 +159,8 @@ export default function App(){
    <section className="game-panel">
     <div className="scene-overlay"><span className="phase-chip">{room.phase.toUpperCase()}</span><strong>{room.message}</strong></div>
     <Scene room={room} id={playerId}/>
+    <RunnerTracker room={room} id={playerId}/>
+    {room.phase==='guessing'&&room.message.startsWith('Wrong guess')&&<div className="guess-result" role="status">{room.message}</div>}
     {(room.phase==='lobby'||room.phase==='guessing'||(room.phase==='chase'&&room.runnerId!==playerId))&&!guessTarget&&<RoundGuide room={room} id={playerId} identity={identity}/>}
     {room.phase==='guessing'&&isDenner&&nearby[0]&&!guessTarget&&<button className="nearby-knock" onClick={()=>setGuessTarget(nearby[0].id)}>Knock on {nearby[0].name} <kbd>E / Space</kbd></button>}
    </section>

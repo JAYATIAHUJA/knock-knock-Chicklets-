@@ -41,14 +41,15 @@ test('Denner cannot move during the initial head start, then can move again',()=
  const start={...d.position};
  assert.equal(g.input(denner,{seq:2,dx:1,dz:0,sprint:true}),false);
  g.tick(r.catchGraceUntil-1);assert.deepEqual(d.position,start);assert.deepEqual(d.velocity,{x:0,z:0});
- r.position={x:10,z:0};g.tick(r.catchGraceUntil);r.catchGraceUntil=0;
+ r.position={x:10,z:0};g.tick(r.catchGraceUntil);r.catchGraceUntil=0;g.chaseStartsAt=Date.now()-1;
  assert.equal(g.input(denner,{seq:3,dx:1,dz:0,sprint:false}),true);
 });
 
-test('every relay freezes the Denner and protects the new runner',()=>{
+test('relay protects the new runner without restarting the Denner freeze',()=>{
  const {g,denner,runner,other}=chase();
+ g.chaseStartsAt=Date.now()-1;
  g.member(other).position={...g.member(denner).position};g.callName(runner,'Guava');
- assert.equal(g.input(denner,{seq:1,dx:1,dz:0,sprint:true}),false);
+ assert.equal(g.input(denner,{seq:1,dx:1,dz:0,sprint:true}),true);
  g.tick(g.member(other).catchGraceUntil-1);assert.equal(g.phase,'chase');assert.equal(g.runnerId,other);
 });
 

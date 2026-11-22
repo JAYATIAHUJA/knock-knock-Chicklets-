@@ -59,7 +59,15 @@ button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid
 .in-game .controls{bottom:20px!important;left:20px!important;transform:none!important}
 .nearby-knock{position:fixed;z-index:40;top:60%;left:50%;transform:translateX(-50%);padding:14px 22px;background:#ffca16;color:#490b30;border:2px solid #490b30;border-radius:12px!important;box-shadow:0 5px 20px #0003;font-weight:700}
 .nearby-knock kbd{margin-left:12px;font-size:12px}
+.runner-tracker{position:absolute;z-index:4;top:105px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:9px 15px;background:#fff3d9f2;color:#4b2631;border:2px solid #793a42;border-radius:12px;box-shadow:0 4px 16px #0003;pointer-events:none;white-space:nowrap}
+.runner-tracker strong,.runner-tracker small{display:block}.runner-tracker strong{font-size:16px}.runner-tracker small{font-size:10px;letter-spacing:.07em}.runner-arrow{font-size:29px;line-height:1;color:#b73336;display:inline-block}
+.guess-result{position:absolute;z-index:4;top:105px;left:50%;transform:translateX(-50%);padding:10px 16px;background:#fff3d9;color:#75352a;border:2px solid #a64d36;border-radius:10px;box-shadow:0 4px 16px #0003;font-weight:700;text-align:center}
+.nearby-knock{top:auto;bottom:22px;white-space:nowrap}
+.in-game.phase-guessing .scene-overlay{display:none}
+.in-game.phase-chase .round-guide{width:220px;padding:10px 12px}.in-game.phase-chase .round-guide nav{display:none}.in-game.phase-chase .round-guide h2{font-size:17px;margin-bottom:3px}.in-game.phase-chase .round-guide p{line-height:1.3}
+.in-game.phase-chase .scene-overlay{display:none}
 @media(max-width:600px){.in-game .round-guide{top:82px!important;width:85vw}.in-game .sidebar{top:190px!important;width:90vw!important;right:5vw!important;max-height:45vh;overflow:auto}.nearby-knock{top:52%;white-space:nowrap}}
+@media(max-width:600px){.runner-tracker{top:75px;left:auto;right:8px;transform:none;padding:6px 9px;gap:6px}.runner-tracker strong{font-size:12px}.runner-tracker small{font-size:8px}.runner-arrow{font-size:20px}.in-game.phase-chase .round-guide{top:auto!important;bottom:98px;width:min(210px,65vw);left:8px}.nearby-knock{top:auto;bottom:12px;max-width:calc(100vw - 20px);padding:10px 14px}.in-game.phase-guessing .round-guide{width:min(205px,60vw)!important}}
 
 html,body,#root{max-width:100%;overflow-x:hidden}
 .landing-root .real-mohalla-site{overflow-x:clip}
