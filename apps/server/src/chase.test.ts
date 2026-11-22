@@ -15,6 +15,7 @@ function chase(){
 
 test('relay choices include only assigned connected identities and stay private to the runner',()=>{
  const {g,denner,runner,other}=chase();
+ assert.ok(Math.abs((g.public().serverTime??0)-Date.now())<100);
  assert.deepEqual(g.privateFor(runner).callNames,['Guava']);
  assert.deepEqual(g.privateFor(denner).callNames,[]);
  assert.deepEqual(g.privateFor(other).callNames,[]);

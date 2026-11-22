@@ -32,7 +32,7 @@ export class ComputerFriends {
     if(target){const v={x:target.position.x-denner.position.x,z:target.position.z-denner.position.z};steer(denner.id,Math.hypot(v.x,v.z)>2.2?v:{x:0,z:0},false)}
    }
    if(g.phase==='chase'&&denner&&runner){
-    if(denner.bot&&now>=runner.catchGraceUntil)steer(denner.id,{x:runner.position.x-denner.position.x,z:runner.position.z-denner.position.z},false);
+    if(denner.bot&&now>=g.chaseStartsAt)steer(denner.id,{x:runner.position.x-denner.position.x,z:runner.position.z-denner.position.z},false);
     for(const p of players.filter(p=>p.bot&&p.connected&&p.id!==denner.id&&p.id!==runner.id)){
      const zone=g.safeZones.filter(z=>now<z.expiresAt).sort((a,b)=>
       Math.hypot(p.position.x-a.x,p.position.z-a.z)-Math.hypot(p.position.x-b.x,p.position.z-b.z))[0];
@@ -80,7 +80,7 @@ export class ComputerFriends {
     g.knock(denner.id,target.id,this.known.get(target.id)||CATEGORIES[g.category][attempt%CATEGORIES[g.category].length]);
    }
   }
-  if(g.phase==='chase'&&runner?.bot&&now-this.since>6000){
+  if(g.phase==='chase'&&runner?.bot&&now-this.since>12000){
    const names=g.privateFor(runner.id).callNames;
    if(names.length)g.callName(runner.id,names[0]);
   }

@@ -9,7 +9,7 @@ export type Speech = {playerId:string;text:string;expiresAt:number};
 export type SafeZone = {id:string;name:string;x:number;z:number;radius:number;capacity:number;expiresAt:number};
 export type BluffSignal = {fromId:string;targetId:string;type:'nod'|'fake'|'whisper';text:string;expiresAt:number};
 export type PrivateState = {identity:string|null;callNames:string[]};
-export type PublicRoom = {code:string;phase:Phase;category:Category|null;players:Player[];dennerId:string|null;runnerId:string|null;message:string;minPlayers:number;knock:Knock|null;speech:Speech|null;relayDeadline?:number|null;chaseStartsAt?:number|null;safeZones?:SafeZone[];bluffSignals?:BluffSignal[]};
+export type PublicRoom = {code:string;phase:Phase;category:Category|null;players:Player[];dennerId:string|null;runnerId:string|null;message:string;minPlayers:number;knock:Knock|null;speech:Speech|null;serverTime?:number;relayDeadline?:number|null;chaseStartsAt?:number|null;safeZones?:SafeZone[];bluffSignals?:BluffSignal[]};
 export const ARENA = 20, SPEED = 4.5, SPRINT = 1.65, SPECTATOR_SPEED = 2.4, RELAY_LIMIT_MS = 20000, SAFE_ZONE_DURATION_MS = 15000, INPUT_TIMEOUT_MS = 250, KNOCK_GRACE_MS = 850, RUNNER_HEAD_START_MS = 3500, STAMINA_DRAIN_PER_SEC = 42, STAMINA_RECOVER_PER_SEC = 24, TICK = 1/60, CATCH_RADIUS = 1.15;
 export function canMove(phase:Phase,id:string,dennerId:string|null,runnerId:string|null,chaseStartsAt=0,now=Date.now()){
   if(phase==='category'||phase==='guessing') return id===dennerId;

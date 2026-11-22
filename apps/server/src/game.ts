@@ -256,6 +256,7 @@ export class Game {
       minPlayers:this.minPlayers,
       knock:this.pendingKnock,
       speech:this.speech,
+      serverTime:Date.now(),
       relayDeadline:this.relayDeadline,
       chaseStartsAt:this.runnerId?this.chaseStartsAt:null,
       safeZones:this.safeZones,

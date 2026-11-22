@@ -131,3 +131,13 @@ html,body,#root{max-width:100%;overflow-x:hidden}
  .in-game .shout-hint{display:none}
  .in-game .round-guide{top:72px!important;max-height:calc(100dvh - 230px)}
 }
+.in-game.phase-chase .round-guide{left:20px!important;top:100px!important;bottom:auto!important;transform:none!important;width:230px}
+@media(max-width:600px){
+ .in-game.phase-chase .round-guide{left:8px!important;top:auto!important;bottom:100px!important;width:min(205px,60vw)}
+ .in-game.phase-chase .round-guide .practice-tip{display:none}
+ .in-game .shout-panel{top:128px;max-height:calc(100dvh - 240px)}
+ .in-game .touch-controls{display:flex;bottom:16px}
+ .in-game .controls{display:block;left:auto!important;right:12px!important;bottom:104px!important;max-width:126px;padding:6px!important}
+ .in-game .controls-label{display:none}
+ .in-game .chai-stamina-container{margin:0;min-width:0}
+}
