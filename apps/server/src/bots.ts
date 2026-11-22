@@ -32,7 +32,15 @@ export class ComputerFriends {
     if(target){const v={x:target.position.x-denner.position.x,z:target.position.z-denner.position.z};steer(denner.id,Math.hypot(v.x,v.z)>2.2?v:{x:0,z:0},false)}
    }
    if(g.phase==='chase'&&denner&&runner){
-    if(denner.bot)steer(denner.id,{x:runner.position.x-denner.position.x,z:runner.position.z-denner.position.z},false);
+    if(denner.bot&&now>=runner.catchGraceUntil)steer(denner.id,{x:runner.position.x-denner.position.x,z:runner.position.z-denner.position.z},false);
+    for(const p of players.filter(p=>p.bot&&p.connected&&p.id!==denner.id&&p.id!==runner.id)){
+     const zone=g.safeZones.filter(z=>now<z.expiresAt).sort((a,b)=>
+      Math.hypot(p.position.x-a.x,p.position.z-a.z)-Math.hypot(p.position.x-b.x,p.position.z-b.z))[0];
+     if(zone){
+      const v={x:zone.x-p.position.x,z:zone.z-p.position.z};
+      steer(p.id,Math.hypot(v.x,v.z)>zone.radius*.6?v:{x:0,z:0},false);
+     }
+    }
     if(runner.bot){
      const away={x:runner.position.x-denner.position.x,z:runner.position.z-denner.position.z};
      const len=Math.hypot(away.x,away.z)||1;
@@ -72,14 +80,9 @@ export class ComputerFriends {
     g.knock(denner.id,target.id,this.known.get(target.id)||CATEGORIES[g.category][attempt%CATEGORIES[g.category].length]);
    }
   }
-  if(g.phase==='chase'&&runner?.bot&&now-this.since>3200){
-   const names=[...this.known].filter(([id])=>id!==runner.id&&id!==g.dennerId&&g.members.get(id)?.connected);
-   if(names.length)g.callName(runner.id,names[0][1]);
-   else if(now-this.since>6000&&g.category){
-    // An uncertain call can be wrong and make the bot out, just like a human.
-    const choices=CATEGORIES[g.category].filter(name=>name!==runner.identity);
-    g.callName(runner.id,choices[Math.floor(Math.random()*choices.length)]);
-   }
+  if(g.phase==='chase'&&runner?.bot&&now-this.since>6000){
+   const names=g.privateFor(runner.id).callNames;
+   if(names.length)g.callName(runner.id,names[0]);
   }
  }
 }

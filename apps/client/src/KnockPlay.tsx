@@ -1,14 +1,17 @@
 import {useEffect,useRef,useState} from 'react';
-import {CATEGORIES,type PublicRoom} from '@chicklets/shared';
+import {type PublicRoom} from '@chicklets/shared';
 import {sounds} from './sound';
 
-type Props={room:PublicRoom;id:string;identity:string|null;act:(event:string,value:unknown)=>Promise<void>};
-export function KnockPlay({room,id,identity,act}:Props){
+type Props={room:PublicRoom;id:string;callNames:string[];act:(event:string,value:unknown)=>Promise<void>};
+export function KnockPlay({room,id,callNames,act}:Props){
  const [reply,setReply]=useState(''),[busy,setBusy]=useState(false),[seconds,setSeconds]=useState(12);
  const knock=room.knock;
  const callPending=useRef(false);
- const canPass=room.players.some(p=>p.connected&&p.id!==id&&p.id!==room.dennerId);
- const callNames=room.category?CATEGORIES[room.category].filter(name=>name!==identity):[];
+ const canPass=callNames.length>0;
+ const [now,setNow]=useState(Date.now());
+ useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),100);return()=>clearInterval(timer)},[]);
+ const headStart=Math.max(0,Math.ceil(((room.chaseStartsAt??0)-now)/1000));
+ const remaining=Math.max(0,Math.ceil(((room.relayDeadline??0)-now)/1000));
 
  async function shout(name:string){
   if(callPending.current)return;
@@ -25,7 +28,7 @@ export function KnockPlay({room,id,identity,act}:Props){
    if(/^[1-7]$/.test(event.key)&&name){event.preventDefault();void shout(name)}
   };
   window.addEventListener('keydown',call);return()=>window.removeEventListener('keydown',call);
- },[room.phase,room.runnerId,room.category,id,identity,canPass,act]);
+ },[room.phase,room.runnerId,room.category,id,callNames,canPass,act]);
 
  useEffect(()=>{
   setReply('');setBusy(false);
@@ -57,7 +60,7 @@ export function KnockPlay({room,id,identity,act}:Props){
  }
  if(room.phase==='chase'&&room.runnerId===id&&room.category){
   return <section className="shout-panel" aria-label="Call another secret name">
-   <h2>Run!</h2><p>{canPass?'Call another player when you know their secret.':'A relay needs a third player.'}</p>
+   <h2>Your turn to run</h2><p>{headStart?`Head start: ${headStart}s. Denner is waiting.`:'Keep moving. Safe spots protect you from tags.'} Relay in {remaining}s.</p><p>{canPass?'Call one of these names to pass the chase.':'No connected player is available for a relay.'}</p>
    {canPass&&<><div className="shout-options">{callNames.map((name,index)=><button key={name} onPointerDown={event=>event.preventDefault()} onClick={()=>void shout(name)}><kbd>{index+1}</kbd> {name}!</button>)}</div><small className="shout-hint">WASD to run · Press 1–7 or tap a name</small></>}
   </section>;
  }

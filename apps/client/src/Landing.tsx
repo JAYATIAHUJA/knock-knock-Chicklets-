@@ -91,7 +91,7 @@ export function Landing({children,onPlay}:{children:ReactNode;onPlay:()=>void}){
    {/* Header Navigation */}
    <header className="site-header">
     <div className="header-brand">
-     <span className="brand-chakra">❋</span>
+
      <div>
       <h1 className="brand-title">CHICKLETS</h1>
       <span className="brand-sub">Lane 04 · Multiplayer courtyard</span>
@@ -114,7 +114,7 @@ export function Landing({children,onPlay}:{children:ReactNode;onPlay:()=>void}){
       <details className="rulebook"><summary>How to play</summary>
        <ol><li><strong>Pick a secret.</strong> The Denner picks a category. If it’s cars, each player secretly picks a different car.</li>
        <li><strong>Call their bluff.</strong> The Denner taps someone and guesses their name. They get a comeback. A correct guess starts the chase.</li>
-       <li><strong>BMW!</strong> Call another secret within 20 seconds and its owner runs next. A wrong call, timeout, tag or boundary crossing puts you out. Everyone else can shelter in marked safe spots.</li></ol>
+       <li><strong>BMW!</strong> Call one of the shown names within 20 seconds and its owner runs next. Each runner gets a head start while the Denner waits. Active safe spots protect everyone from tags. A timeout, tag outside safety or boundary crossing puts you out.</li></ol>
       </details>
      </div>
     </section>
@@ -123,7 +123,7 @@ export function Landing({children,onPlay}:{children:ReactNode;onPlay:()=>void}){
     <section className="hero-right">
      <div className="adda-card">
       <h3 className="adda-heading">Play Chicklets</h3>
-      
+
       {/* Form children passed from App.tsx */}
       <div className="adda-form-container">
        {children}

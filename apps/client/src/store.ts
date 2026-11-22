@@ -1,3 +1,3 @@
 import {create} from 'zustand';import type {PublicRoom} from '@chicklets/shared';
-type State={room:PublicRoom|null;playerId:string;identity:string|null;error:string;setRoom:(v:PublicRoom|null)=>void;setPlayerId:(v:string)=>void;setIdentity:(v:string|null)=>void;setError:(v:string)=>void};
-export const useGame=create<State>(set=>({room:null,playerId:'',identity:null,error:'',setRoom:room=>set({room}),setPlayerId:playerId=>set({playerId}),setIdentity:identity=>set({identity}),setError:error=>set({error})}));
+type State={room:PublicRoom|null;playerId:string;identity:string|null;callNames:string[];setCallNames:(v:string[])=>void;error:string;setRoom:(v:PublicRoom|null)=>void;setPlayerId:(v:string)=>void;setIdentity:(v:string|null)=>void;setError:(v:string)=>void};
+export const useGame=create<State>(set=>({room:null,playerId:'',identity:null,callNames:[],setCallNames:callNames=>set({callNames}),error:'',setRoom:room=>set({room}),setPlayerId:playerId=>set({playerId}),setIdentity:identity=>set({identity}),setError:error=>set({error})}));

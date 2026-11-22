@@ -23,7 +23,6 @@ export function RoleReveal({isDenner,playerColor,playerName,onDone}:Props){
 
   const label   = isDenner ? 'DENNER' : 'PLAYER';
   const sublabel= isDenner ? 'You’re the chaser.' : 'Keep a straight face.';
-  const emoji   = isDenner ? '👑' : '🎭';
   const accent  = isDenner ? '#d44a2a' : '#3a9e72';
 
   return (
@@ -38,7 +37,6 @@ export function RoleReveal({isDenner,playerColor,playerName,onDone}:Props){
 
       {/* Central avatar disc */}
       <div className="role-disc" style={{background:isDenner?'#c43828':playerColor}}>
-        <span className="role-disc-emoji">{emoji}</span>
       </div>
 
       {/* Text block */}

@@ -1,7 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import {ComputerFriends} from './bots.js';
 
-import { ARENA,CATEGORIES,canMove,caught,chooseDenner,stepMotion,outside,RELAY_LIMIT_MS,SAFE_ZONE_DURATION_MS,type Category,type Input,type Player,type PublicRoom,type SafeZone,type Vec } from '@chicklets/shared';
+import { ARENA,CATEGORIES,canMove,caught,chooseDenner,stepMotion,outside,RELAY_LIMIT_MS,SAFE_ZONE_DURATION_MS,RUNNER_HEAD_START_MS,type PrivateState,type Category,type Input,type Player,type PublicRoom,type SafeZone,type Vec } from '@chicklets/shared';
 
 
 
@@ -45,7 +45,7 @@ export class Game {
       return false;
     }
     this.runnerId=targetId;
-    target.role='runner';target.catchGraceUntil=Date.now()+3500;
+    target.role='runner';target.catchGraceUntil=Date.now()+RUNNER_HEAD_START_MS;
     this.phase='chase';
     this.relayDeadline=Date.now()+RELAY_LIMIT_MS;
     this.generateSafeZones(Date.now());
@@ -124,17 +124,17 @@ export class Game {
 
     if(name===runner.identity)throw Error('You cannot call your own name');
 
-    if(Date.now()>=runner.catchGraceUntil&&caught(this.member(this.dennerId!).position,runner.position)){this.catchRunner('Pakde gaye!');return}
+    if(Date.now()>=runner.catchGraceUntil&&!this.isPlayerSafe(runner)&&caught(this.member(this.dennerId!).position,runner.position)){this.catchRunner('Pakde gaye!');return}
 
     const target=[...this.members.values()].find(p=>p.id!==id&&p.id!==this.dennerId&&p.identity===name&&p.connected);
 
-    this.speech={playerId:id,text:`${name}!`,expiresAt:Date.now()+4000};
+    if(!target)throw Error('That relay name is no longer available');
 
-    if(!target){this.catchRunner(`${name}? Galat naam — out!`);return}
+    this.speech={playerId:id,text:`${name}!`,expiresAt:Date.now()+4000};
 
     runner.role='other';runner.input={seq:runner.lastSeq,dx:0,dz:0,sprint:false};runner.velocity={x:0,z:0};
 
-    target.role='runner';target.catchGraceUntil=Date.now()+3500;target.input={seq:target.lastSeq,dx:0,dz:0,sprint:false};target.velocity={x:0,z:0};
+    target.role='runner';target.catchGraceUntil=Date.now()+RUNNER_HEAD_START_MS;target.input={seq:target.lastSeq,dx:0,dz:0,sprint:false};target.velocity={x:0,z:0};
 
     this.runnerId=target.id;
     this.relayDeadline=Date.now()+RELAY_LIMIT_MS;
@@ -142,7 +142,7 @@ export class Game {
 
   }
 
-  input(id:string,input:Input){const p=this.member(id),now=Date.now();if(!p.connected||!canMove(this.phase,id,this.dennerId,this.runnerId))return false;if(!Number.isInteger(input.seq)||input.seq<=p.lastSeq||!Number.isFinite(input.dx)||!Number.isFinite(input.dz)||Math.abs(input.dx)>1||Math.abs(input.dz)>1||typeof input.sprint!=='boolean')return false;if(now-p.lastInputAt<12)return false;p.lastInputAt=now;p.lastSeq=input.seq;p.input=input;return true}
+  input(id:string,input:Input){const p=this.member(id),now=Date.now();if(!p.connected||!canMove(this.phase,id,this.dennerId,this.runnerId,this.runnerId?this.member(this.runnerId).catchGraceUntil:0,now))return false;if(!Number.isInteger(input.seq)||input.seq<=p.lastSeq||!Number.isFinite(input.dx)||!Number.isFinite(input.dz)||Math.abs(input.dx)>1||Math.abs(input.dz)>1||typeof input.sprint!=='boolean')return false;if(now-p.lastInputAt<12)return false;p.lastInputAt=now;p.lastSeq=input.seq;p.input=input;return true}
 
   tick(now=Date.now()){
     this.computers.tick(this,now);
@@ -157,7 +157,7 @@ export class Game {
       return;
     }
     for(const p of this.members.values()){
-      if(!p.connected||!canMove(this.phase,p.id,this.dennerId,this.runnerId)){
+      if(!p.connected||!canMove(this.phase,p.id,this.dennerId,this.runnerId,this.runnerId?this.member(this.runnerId).catchGraceUntil:0,now)){
         p.velocity={x:0,z:0};
         continue;
       }
@@ -191,7 +191,7 @@ export class Game {
       return;
     }
     // Tag check: Denner catches Runner
-    if(this.phase==='chase'&&this.dennerId&&this.runnerId&&now>=this.member(this.runnerId).catchGraceUntil&&caught(this.member(this.dennerId).position,this.member(this.runnerId).position)) {
+    if(this.phase==='chase'&&this.dennerId&&this.runnerId&&now>=this.member(this.runnerId).catchGraceUntil&&!this.isPlayerSafe(this.member(this.runnerId),now)&&caught(this.member(this.dennerId).position,this.member(this.runnerId).position)) {
       this.catchRunner('Caught!');
       return;
     }
@@ -199,7 +199,7 @@ export class Game {
     if(this.phase==='chase'&&this.dennerId){
       const dennerPos = this.member(this.dennerId).position;
       for(const p of this.members.values()){
-        if(p.id!==this.dennerId && p.id!==this.runnerId && p.connected && now>=this.member(this.runnerId!).catchGraceUntil && !this.isPlayerSafe(p)){
+        if(p.id!==this.dennerId && p.id!==this.runnerId && p.connected && now>=this.member(this.runnerId!).catchGraceUntil && !this.isPlayerSafe(p,now)){
           if(caught(dennerPos, p.position)){
             this.runnerId = p.id; // Target switched to caught spectator!
             this.catchRunner(`Safe zone ke bahar pakde gaye! ${p.name} is OUT!`);
@@ -210,7 +210,7 @@ export class Game {
     }
   }
 
-  nextRound(){this.computers.reset();this.pendingKnock=null;this.speech=null;this.phase='category';this.category=null;this.runnerId=null;this.relayDeadline=null;this.message=`${this.member(this.dennerId!).name} is the new DENNER. Pick a category!`;for(const p of this.members.values()){p.identity=null;p.position=this.spawnPosition(p.id);p.input={seq:p.lastSeq,dx:0,dz:0,sprint:false}}}
+  nextRound(){this.computers.reset();this.pendingKnock=null;this.speech=null;this.phase='category';this.category=null;this.runnerId=null;this.relayDeadline=null;this.safeZones=[];this.bluffSignals=[];this.message=`${this.member(this.dennerId!).name} is the new DENNER. Pick a category!`;for(const p of this.members.values()){p.identity=null;p.position=this.spawnPosition(p.id);p.input={seq:p.lastSeq,dx:0,dz:0,sprint:false}}}
 
   catchRunner(reason:string){if(!this.runnerId)return;const runner=this.member(this.runnerId);this.dennerId=this.runnerId;this.runnerId=null;this.relayDeadline=null;for(const p of this.members.values()){p.role=p.id===this.dennerId?'denner':'other';p.input={seq:p.lastSeq,dx:0,dz:0,sprint:false}}this.phase='caught';this.message=`${reason} ${runner.name} is the new DENNER.`;this.transitionAt=Date.now()+3500}
 
@@ -231,12 +231,11 @@ export class Game {
     this.safeZoneNextRotationAt = now + SAFE_ZONE_DURATION_MS;
   }
 
-  isPlayerSafe(p:Member):boolean{
-    // Runner and Denner are never safe in safe zones
-    if(p.id===this.runnerId||p.id===this.dennerId) return false;
+  isPlayerSafe(p:Member,now=Date.now()):boolean{
+    if(p.id===this.dennerId) return false;
     for(const sz of this.safeZones){
       const dist = Math.hypot(p.position.x-sz.x, p.position.z-sz.z);
-      if(dist <= sz.radius){
+      if(now<sz.expiresAt&&dist <= sz.radius){
         return true;
       }
     }
@@ -257,13 +256,18 @@ export class Game {
       knock:this.pendingKnock,
       speech:this.speech,
       relayDeadline:this.relayDeadline,
+      chaseStartsAt:this.runnerId?this.member(this.runnerId).catchGraceUntil:null,
       safeZones:this.safeZones,
       bluffSignals:this.bluffSignals,
       players:[...this.members.values()].map(({identity,input,lastInputAt,...p})=>p)
     };
   }
 
-  privateFor(id:string){return {identity:this.member(id).identity}}
+  privateFor(id:string):PrivateState{
+    return {identity:this.member(id).identity,callNames:this.phase==='chase'&&id===this.runnerId
+      ?[...this.members.values()].filter(p=>p.connected&&p.id!==id&&p.id!==this.dennerId&&p.identity).map(p=>p.identity!).sort()
+      :[]};
+  }
 
 }
 

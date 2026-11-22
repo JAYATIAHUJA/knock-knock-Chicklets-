@@ -1,19 +1,19 @@
 import {useEffect,useState,useRef} from 'react';
-import {CATEGORIES,type Category} from '@chicklets/shared';
+import {CATEGORIES} from '@chicklets/shared';
 import {socket,send,saveSession} from './network';
 import {useGame} from './store';
 import {Scene} from './scene';
 import {RoundGuide} from './RoundGuide';
 import {KnockPlay} from './KnockPlay';
 import {Landing} from './Landing';
-import {RoleReveal} from './RoleReveal';
+import {PhaseChoices} from './PhaseChoices';
 import {RoundRecap} from './RoundRecap';
 import {sounds} from './sound';
 
 const colors=['#db7857','#6b9b78','#d4a047','#8296bd','#ae82a6','#79aeb2'];
 
 export default function App(){
- const {room,playerId,identity,error,setError}=useGame();
+ const {room,playerId,identity,callNames,error,setError}=useGame();
  const [name,setName]=useState(localStorage.getItem('chicklets-name')||'Rookie');
  const [color,setColor]=useState(colors[0]);
  const [code,setCode]=useState(new URLSearchParams(location.search).get('room')||'');
@@ -24,9 +24,6 @@ export default function App(){
  const [copied,setCopied]=useState(false);
  const [busy,setBusy]=useState(false);
 
- // Role reveal state
- const [showReveal,setShowReveal]=useState(false);
- const revealShownForRound=useRef('');  // prevent double-firing
 
  // Round recap state
  const [recap,setRecap]=useState<null|{
@@ -43,21 +40,15 @@ export default function App(){
 
  const me=room?.players.find(p=>p.id===playerId);
  const isDenner=playerId===room?.dennerId;
- const nearby=room?.players.filter(p=>p.id!==playerId&&me&&p.connected&&Math.hypot(p.position.x-me.position.x,p.position.z-me.position.z)<2.5)||[];
+ const nearby=room?.players.filter(p=>p.id!==playerId&&me&&p.connected&&Math.hypot(p.position.x-me.position.x,p.position.z-me.position.z)<=2.5)
+  .sort((a,b)=>Math.hypot(a.position.x-me!.position.x,a.position.z-me!.position.z)-Math.hypot(b.position.x-me!.position.x,b.position.z-me!.position.z))||[];
 
  useEffect(()=>{
   if(!room)return;
   const prev=lastPhase.current;
   const curr=room.phase;
-  // ── CATEGORY: Among Us role reveal ─────────────────────────
-  if(curr==='category' && curr!==prev){
-   const roundKey=room.dennerId??'';
-   if(revealShownForRound.current!==roundKey){
-    revealShownForRound.current=roundKey;
-    setShowReveal(true);
-    setRecap(null); // clear old recap
-   }
-  }
+   // Clear the previous recap when the next round begins.
+  if(curr==='category'&&curr!==prev)setRecap(null);
 
   // ── CHASE: start tracking survival time ───────────────────
   if(curr==='chase'&&prev!=='chase'){
@@ -131,11 +122,12 @@ export default function App(){
   window.addEventListener('keydown',knock);
   return()=>window.removeEventListener('keydown',knock);
  },[room?.phase,isDenner,nearby[0]?.id]);
+ useEffect(()=>{if(room?.phase!=='guessing')setGuessTarget(null)},[room?.phase]);
  const url=room?`${location.origin}?room=${room.code}`:'';
 
  return <div className={`app ${room?'in-game':''} ${room?.phase==='caught'?'caught-flash':''}`} aria-busy={busy}>
   <header>
-   <div className="brand"><span className="brand-icon">❋</span><div><strong>CHICKLETS</strong><small>The secret-name chase</small></div></div>
+   <div className="brand"><div><strong>CHICKLETS</strong><small>The secret-name chase</small></div></div>
    <span className="top-note">THE NEIGHBORHOOD CHASE</span>
    {room&&<div className="room-code">ROOM <b>{room.code}</b><button onClick={async()=>{await navigator.clipboard.writeText(url);setCopied(true);setTimeout(()=>setCopied(false),1800)}}>{copied?'COPIED!':'COPY LINK'}</button></div>}
   </header>
@@ -166,10 +158,10 @@ export default function App(){
    <section className="game-panel">
     <div className="scene-overlay"><span className="phase-chip">{room.phase.toUpperCase()}</span><strong>{room.message}</strong></div>
     <Scene room={room} id={playerId}/>
-    <RoundGuide room={room} id={playerId} identity={identity}/>
+    {(room.phase==='lobby'||room.phase==='guessing'||(room.phase==='chase'&&room.runnerId!==playerId))&&!guessTarget&&<RoundGuide room={room} id={playerId} identity={identity}/>}
     {room.phase==='guessing'&&isDenner&&nearby[0]&&!guessTarget&&<button className="nearby-knock" onClick={()=>setGuessTarget(nearby[0].id)}>Knock on {nearby[0].name} <kbd>E / Space</kbd></button>}
    </section>
-   <aside className="sidebar">
+   {room.phase==='lobby'&&<aside className="sidebar">
     <div className="side-heading">
      <span>THE COURTYARD</span>
      <h2>{room.phase==='lobby'?'Gather the gang':room.phase==='chase'?'Run, run, run!':room.phase==='caught'?'Caught!':'The game is on'}</h2>
@@ -179,55 +171,18 @@ export default function App(){
      <div className="section-title">PLAYERS <span>{room.players.length}/8</span></div>
      {room.players.map(p=><div key={p.id} className={`player-row ${p.connected?'':'offline'}`}><span className="player-dot" style={{background:p.color}}/><span>{p.name}{p.bot?' · computer':p.id===playerId?' (you)':''}</span><small>{!p.connected?'RECONNECTING':room.phase==='lobby'?(p.ready?'READY':'WAITING'):p.role==='denner'?'DENNER':p.role==='runner'?'RUNNER':'PLAYER'}</small></div>)}
     </div>
-    {room.phase==='lobby'&&<button className="primary wide" onClick={()=>act('ready',!me?.ready)}>{me?.ready?'CANCEL READY':'I\'M READY'} <span>✦</span></button>}
-    {room.phase==='category'&&isDenner&&<div className="action-box"><div className="section-title">CHOOSE A CATEGORY</div>{Object.keys(CATEGORIES).map(c=><button className="option" key={c} onClick={()=>act('category',c as Category)}>{c} <span>→</span></button>)}</div>}
-    {room.phase==='identity'&&!isDenner&&<div className="action-box desi-identity-box">
-      <div className="section-title">CHOOSE SECRET {room.category?.toUpperCase()}</div>
-      {identity?<div className="matchbox-card selected-matchbox">
-        <div className="matchbox-striker"/>
-        <div className="matchbox-label">
-          <span className="matchbox-brand">SECRET TAASH</span>
-          <h3 className="matchbox-text">{identity}</h3>
-          <small className="matchbox-sub">Keep it secret</small>
-        </div>
-      </div>:(
-        <div className="matchbox-grid">
-          {(room.category?CATEGORIES[room.category]:[]).map((v, idx)=><button className="matchbox-card" key={v} onClick={()=>act('identity',v)}>
-            <div className="matchbox-striker"/>
-            <div className="matchbox-label">
-              <span className="matchbox-brand">NO. 0{idx+1} · SPECIAL</span>
-              <h4 className="matchbox-text">{v}</h4>
-              <span className="matchbox-tag">Choose →</span>
-            </div>
-          </button>)}
-        </div>
-      )}
-    </div>}
-    {room.phase==='identity'&&isDenner&&<p className="note">Waiting for the others to choose...</p>}
-
-    {room.phase==='chase'&&<div key={room.runnerId} className="relay-ticket" role="status">
-      <small>{room.speech?.playerId && room.speech.playerId!==room.runnerId ? room.players.find(p=>p.id===room.speech?.playerId)?.name+' made the call' : 'On the run'}</small>
-      <strong>{playerId===room.runnerId?'You’re up!':room.players.find(p=>p.id===room.runnerId)?.name+' is up!'}</strong>
-      <span>{isDenner?'Tag the runner before the next call.':playerId===room.runnerId?'Call another player’s secret name.':'Find a safe spot. Listen for your name.'}</span>
-    </div>}
+    {room.phase==='lobby'&&<button className="primary wide" onClick={()=>act('ready',!me?.ready)}>{me?.ready?'CANCEL READY':'I\'M READY'}</button>}
     <div className="side-bottom">WASD / ARROWS TO MOVE · SHIFT TO SPRINT<br/>Made for friends, shared screens, and old streets.</div>
-   </aside>
+   </aside>}
   </main>}
 
-  {room&&<KnockPlay room={room} id={playerId} identity={identity} act={act}/>}
-
-  {/* Among Us-style role reveal */}
-  {room&&showReveal&&me&&<RoleReveal
-   isDenner={isDenner}
-   playerColor={me.color}
-   playerName={me.name}
-   onDone={()=>setShowReveal(false)}
-  />}
+  {room&&<PhaseChoices room={room} id={playerId} identity={identity} act={act}/>}
+  {room&&<KnockPlay room={room} id={playerId} callNames={callNames} act={act}/>}
 
   {/* Round recap */}
   {room&&recap&&room.phase==='caught'&&<RoundRecap {...recap}/>}
 
   {error&&<div className="toast" role="alert">{error}<button onClick={()=>setError('')}>×</button></div>}
-  {guessTarget&&room?.category&&<div className="modal-shade" onClick={()=>setGuessTarget(null)}><div className="modal" onClick={e=>e.stopPropagation()}><button className="close" onClick={()=>setGuessTarget(null)}>×</button><p className="eyebrow">MAKE A GUESS</p><h2>Are you…?</h2><p>{room.players.find(p=>p.id===guessTarget)?.name} is listening. Pick your guess.</p><div className="guess-grid">{CATEGORIES[room.category].map(v=><button key={v} onClick={()=>act('guess',{targetId:guessTarget,identity:v})}>{v}</button>)}</div></div></div>}
+  {guessTarget&&room?.phase==='guessing'&&room.category&&<div className="modal-shade" onClick={()=>setGuessTarget(null)}><div className="modal" onClick={e=>e.stopPropagation()}><button className="close" onClick={()=>setGuessTarget(null)}>×</button><p className="eyebrow">MAKE A GUESS</p><h2>Are you…?</h2><p>{room.players.find(p=>p.id===guessTarget)?.name} is listening. Pick your guess.</p><div className="guess-grid">{CATEGORIES[room.category].map(v=><button key={v} onClick={()=>act('guess',{targetId:guessTarget,identity:v})}>{v}</button>)}</div></div></div>}
  </div>
 }

@@ -8,11 +8,12 @@ export type Knock = {id:string;dennerId:string;targetId:string;name:string;expir
 export type Speech = {playerId:string;text:string;expiresAt:number};
 export type SafeZone = {id:string;name:string;x:number;z:number;radius:number;capacity:number;expiresAt:number};
 export type BluffSignal = {fromId:string;targetId:string;type:'nod'|'fake'|'whisper';text:string;expiresAt:number};
-export type PublicRoom = {code:string;phase:Phase;category:Category|null;players:Player[];dennerId:string|null;runnerId:string|null;message:string;minPlayers:number;knock:Knock|null;speech:Speech|null;relayDeadline?:number|null;safeZones?:SafeZone[];bluffSignals?:BluffSignal[]};
-export const ARENA = 20, SPEED = 4.5, SPRINT = 1.65, SPECTATOR_SPEED = 2.4, RELAY_LIMIT_MS = 20000, SAFE_ZONE_DURATION_MS = 15000, INPUT_TIMEOUT_MS = 250, KNOCK_GRACE_MS = 850, STAMINA_DRAIN_PER_SEC = 42, STAMINA_RECOVER_PER_SEC = 24, TICK = 1/60, CATCH_RADIUS = 1.15;
-export function canMove(phase:Phase,id:string,dennerId:string|null,runnerId:string|null){
+export type PrivateState = {identity:string|null;callNames:string[]};
+export type PublicRoom = {code:string;phase:Phase;category:Category|null;players:Player[];dennerId:string|null;runnerId:string|null;message:string;minPlayers:number;knock:Knock|null;speech:Speech|null;relayDeadline?:number|null;chaseStartsAt?:number|null;safeZones?:SafeZone[];bluffSignals?:BluffSignal[]};
+export const ARENA = 20, SPEED = 4.5, SPRINT = 1.65, SPECTATOR_SPEED = 2.4, RELAY_LIMIT_MS = 20000, SAFE_ZONE_DURATION_MS = 15000, INPUT_TIMEOUT_MS = 250, KNOCK_GRACE_MS = 850, RUNNER_HEAD_START_MS = 3500, STAMINA_DRAIN_PER_SEC = 42, STAMINA_RECOVER_PER_SEC = 24, TICK = 1/60, CATCH_RADIUS = 1.15;
+export function canMove(phase:Phase,id:string,dennerId:string|null,runnerId:string|null,chaseStartsAt=0,now=Date.now()){
   if(phase==='category'||phase==='guessing') return id===dennerId;
-  if(phase==='chase') return true; // Denner, Runner, and Spectators all can roam!
+  if(phase==='chase') return id!==dennerId||now>=chaseStartsAt;
   return false;
 }
 export function move(pos:Vec,input:Input,dt=TICK){const len=Math.hypot(input.dx,input.dz);const scale=len>1?1/len:1;const speed=SPEED*(input.sprint?SPRINT:1);return {x:pos.x+input.dx*scale*speed*dt,z:pos.z+input.dz*scale*speed*dt}}

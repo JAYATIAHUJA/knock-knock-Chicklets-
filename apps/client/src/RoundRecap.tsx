@@ -15,9 +15,9 @@ function fmt(ms:number){
 
 export function RoundRecap({runnerName,dennerName,newDennerName,chain,survivalMs,relayCount,catchReason}:Props){
   const badges=[];
-  if(survivalMs>30000)badges.push({e:'⭐',t:'Brave Runner!'});
-  if(relayCount>=2)   badges.push({e:'👑',t:'Relay King!'});
-  if(survivalMs<5000) badges.push({e:'💨',t:'Quick Catch!'});
+  if(survivalMs>30000)badges.push({t:'Brave Runner!'});
+  if(relayCount>=2)   badges.push({t:'Relay King!'});
+  if(survivalMs<5000) badges.push({t:'Quick Catch!'});
 
   return (
     <div className="round-recap" role="status" aria-label="Round recap">
@@ -46,13 +46,12 @@ export function RoundRecap({runnerName,dennerName,newDennerName,chain,survivalMs
         {badges.length>0&&(
           <div className="recap-badges">
             {badges.map(b=>(
-              <span key={b.t} className="recap-badge">{b.e} {b.t}</span>
+              <span key={b.t} className="recap-badge">{b.t}</span>
             ))}
           </div>
         )}
 
         <div className="recap-next">
-          <span className="recap-crown">👑</span>
           <strong>{newDennerName}</strong> is the new DENNER!
         </div>
       </div>

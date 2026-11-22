@@ -89,3 +89,37 @@ html,body,#root{max-width:100%;overflow-x:hidden}
 .intro-curtain .skip-intro-btn{z-index:20;min-height:48px}
 .real-mohalla-site,.intro-curtain,.shutter-hand{image-rendering:auto}
 @media(max-width:900px){.landing-root .hero-viewport{gap:32px;padding:28px 20px}.landing-root .hero-right{order:-1}.landing-root .adda-card{max-width:600px}.landing-root .arcade-cover h2{font-size:52px}.landing-root .site-header{gap:12px}.landing-root .badge-btn{font-size:12px}}
+
+/* Phase choices have one central surface, separate from the moving playfield HUD. */
+.phase-choice-stage{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:80px 20px 20px;background:#201b1870}
+.phase-choice-card{width:min(460px,100%);max-height:100%;overflow:auto;background:var(--poster-paper);color:var(--poster-dark);border:2px solid var(--poster-dark);padding:24px;box-shadow:6px 6px 0 #201b1840}
+.phase-choice-card h2{margin:8px 0;font-size:28px;line-height:1.2}
+.phase-choice-card p{font-size:14px;line-height:1.5}
+.phase-choice-card .guess-grid button{min-height:48px;background:#fffaf0;color:var(--poster-dark)}
+.chosen-secret{display:grid;gap:6px;margin-top:18px;padding:16px;background:var(--poster-yellow)}
+.chosen-secret small{font-size:11px;letter-spacing:.1em}
+.chosen-secret strong{font-size:28px}
+.in-game .shout-panel{position:fixed;z-index:20;left:50%;right:auto;top:90px;bottom:auto;transform:translateX(-50%);width:min(460px,calc(100vw - 32px));max-width:none;max-height:calc(100dvh - 290px);overflow:auto;text-align:center;padding:14px 18px}
+.in-game .shout-panel h2{margin:0 0 6px;font-size:24px}
+.in-game .shout-panel p{margin:4px 0 10px;font-size:13px}
+.in-game .shout-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.in-game .shout-options button{width:100%;min-width:0;min-height:48px;padding:8px 6px;overflow-wrap:anywhere}
+.in-game .touch-controls{bottom:18px}
+.in-game .toast{z-index:250}
+@media(max-width:600px){
+ .phase-choice-stage{padding:72px 16px 16px}
+ .phase-choice-card{padding:18px}
+ .phase-choice-card h2{font-size:24px}
+ .in-game .shout-panel{top:76px;padding:12px;max-height:calc(100dvh - 260px)}
+ .in-game .shout-panel h2{font-size:21px}
+ .in-game .shout-options{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .in-game .round-guide{max-height:calc(100dvh - 270px);overflow:auto}
+}
+@media(max-height:500px){
+ .phase-choice-stage{padding:65px 12px 12px}
+ .in-game .shout-panel{top:70px;width:min(460px,calc(100vw - 330px));max-height:calc(100dvh - 90px)}
+ .in-game .shout-panel h2{font-size:18px}
+ .in-game .shout-panel p{font-size:11px;margin:3px 0}
+ .in-game .shout-hint{display:none}
+ .in-game .round-guide{top:72px!important;max-height:calc(100dvh - 230px)}
+}

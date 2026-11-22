@@ -7,7 +7,7 @@ export const localMotionInput={seq:0,dx:0,dz:0,sprint:false};
 
 export function Controls({room,id}:{room:PublicRoom;id:string}){
  const pressed=useRef(new Set<string>()),touch=useRef(new Set<string>()),seq=useRef(Date.now());
- const allowed=canMove(room.phase,id,room.dennerId,room.runnerId);
+ const allowed=canMove(room.phase,id,room.dennerId,room.runnerId,room.chaseStartsAt??0);
  const me=room.players.find(p=>p.id===id);
  const stamina=Math.round(me?.stamina??100);
  const energy=useRef(stamina);
@@ -52,7 +52,6 @@ export function Controls({room,id}:{room:PublicRoom;id:string}){
     <div className="chai-glass">
       <div className="chai-liquid" style={{height:`${stamina}%`}}/>
       <div className="chai-stripes"/>
-      <div className="chai-steam">♨</div>
     </div>
     <div className="chai-meter-wrapper">
       <div className="chai-label-row">

@@ -19,8 +19,8 @@ Open `http://localhost:5173`. Create an adda, copy the link, and join with diffe
 2. Other players choose unique secret names, such as Maruti and BMW.
 3. The DENNER approaches a player and knocks with a guessed name. That player sees “Knock knock! Kya tum Maruti ho?” and can type a reply or tap a quick comeback.
 4. The server checks the actual secret after the reply, or after a 12-second timeout. A wrong guess resumes knocking; a correct guess starts the chase.
-5. The runner can call another name using the buttons or number keys 1–7 while moving. Calling an assigned, connected player's name transfers the chase and freezes the old runner. Calling an unassigned name makes the caller out and the next DENNER. Calling your own name is rejected.
-6. A tag or crossing the square chalk boundary also makes the runner the next DENNER. A fresh round follows.
+5. The runner sees only assigned, connected players' secret names in the centre relay panel. Tap one or use its number key while moving to transfer the chase. Own, unassigned or disconnected names are rejected without eliminating the caller. Choices are private to the current runner; the DENNER cannot see the list.
+6. Each new runner gets a 3.5-second head start with the DENNER held still. Active safe spots protect runners and other players from tags until the spots rotate. A tag outside safety, crossing the square chalk boundary, or failing to relay within 20 seconds makes the runner the next DENNER. A fresh round follows.
 
 Replies are plain text, visible in character speech bubbles. They cannot override whether the guessed name matches. A player disconnecting during their knock cancels that exchange.
 
