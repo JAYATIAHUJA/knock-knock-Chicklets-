@@ -86,7 +86,7 @@ test('Denner collects the central freeze pickup and runner cannot move or relay 
  g.chaseStartsAt=now-1;g.member(runner).position={x:12,z:0};
  g.member(denner).position={x:0,z:0};g.safeZones=[];g.safeZoneNextRotationAt=now+10000;
  g.tick(now);
- assert.ok(g.member(runner).freezeUntil>now);
+ assert.equal(g.member(runner).freezeUntil,now+5000);
  assert.equal(g.input(runner,{seq:1,dx:1,dz:0,sprint:false}),false);
  assert.throws(()=>g.callName(runner,'Guava'),/frozen/i);
  assert.ok((g.public().powerup?.availableAt??0)>now);

@@ -19,7 +19,7 @@ export class Game {
 
   constructor(minPlayers=5,code=randomBytes(3).toString('hex').toUpperCase()){this.minPlayers=minPlayers;this.code=code}
 
-  add(id:string,name:string,color:string,avatar?:AvatarChoice){if(this.phase!=='lobby')throw Error('Round already started');if(this.members.size>=8)throw Error('Room is full');if(!name.trim()||name.length>20)throw Error('Name must be 1â€“20 characters');if(!/^#[0-9a-fA-F]{6}$/.test(color))throw Error('Invalid colour');if(avatar!==undefined&&!(['chintu','gudiya','bunty'] as string[]).includes(avatar))throw Error('Invalid character');const n=this.members.size;this.members.set(id,{id,name:name.trim(),color,avatar,stamina:100,catchGraceUntil:0,freezeUntil:0,ready:false,connected:true,position:{x:(n%4-1.5)*2.2,z:Math.floor(n/4)*2.2},role:'other',identity:null,input:{seq:0,dx:0,dz:0,sprint:false},velocity:{x:0,z:0},lastSeq:0,lastInputAt:0});return this.public()}
+  add(id:string,name:string,color:string,avatar?:AvatarChoice){if(this.phase!=='lobby')throw Error('Round already started');if(this.members.size>=8)throw Error('Room is full');if(!name.trim()||name.length>20)throw Error('Name must be 1â€“20 characters');if(!/^#[0-9a-fA-F]{6}$/.test(color))throw Error('Invalid colour');if(avatar!==undefined&&!(['chintu','gudiya','bunty','tara','kabir'] as string[]).includes(avatar))throw Error('Invalid character');const n=this.members.size;this.members.set(id,{id,name:name.trim(),color,avatar,stamina:100,catchGraceUntil:0,freezeUntil:0,ready:false,connected:true,position:{x:(n%4-1.5)*2.2,z:Math.floor(n/4)*2.2},role:'other',identity:null,input:{seq:0,dx:0,dz:0,sprint:false},velocity:{x:0,z:0},lastSeq:0,lastInputAt:0});return this.public()}
 
   remove(id:string){const wasDenner=id===this.dennerId,wasRunner=id===this.runnerId;this.members.delete(id);if(this.members.size<this.minPlayers){this.reset('Waiting for more players');return}if(wasDenner||wasRunner||this.phase==='identity'||this.phase==='knock'||this.phase==='caught'){this.reset('A player left. Ready up for a new round.')}else if(this.phase==='guessing'&&this.members.size-1===0){this.reset('Waiting for more players')} }
 
@@ -196,7 +196,7 @@ export class Game {
     if(this.phase==='chase'&&this.dennerId&&this.runnerId&&now>=this.chaseStartsAt&&now>=this.powerupAvailableAt){
       const denner=this.member(this.dennerId),runner=this.member(this.runnerId);
       if(Math.hypot(denner.position.x,denner.position.z)<=1.3&&!this.isInsideSafeZone(denner.position,now)){
-        runner.freezeUntil=now+1400;
+        runner.freezeUntil=now+5000;
         runner.input={seq:runner.lastSeq,dx:0,dz:0,sprint:false};runner.velocity={x:0,z:0};
         this.powerupAvailableAt=now+18000;
         this.message=`${denner.name} picked up Freeze! ${runner.name} is frozen briefly.`;

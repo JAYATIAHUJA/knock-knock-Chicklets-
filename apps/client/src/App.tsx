@@ -13,7 +13,7 @@ import {LobbyStage} from './LobbyStage';
 import {sounds} from './sound';
 
 const colors=['#db7857','#6b9b78','#d4a047','#8296bd','#ae82a6','#79aeb2'];
-const characters:AvatarChoice[]=['chintu','gudiya','bunty'];
+const characters:AvatarChoice[]=['chintu','gudiya','bunty','tara','kabir'];
 
 export default function App(){
  const {room,playerId,identity,callNames,error,setError}=useGame();
@@ -142,7 +142,7 @@ export default function App(){
     <label>Your nickname<input maxLength={20} value={name} onChange={e=>setName(e.target.value)} placeholder="e.g. Chintu"/></label>
     <details className="room-settings" open><summary>Room settings</summary>
     <div className="color-label">Pick your character</div>
-    <div className="character-choices">{characters.map(choice=><button key={choice} type="button" aria-label={`Choose ${choice}`} aria-pressed={avatar===choice} className={avatar===choice?'selected':''} onClick={()=>setAvatar(choice)}><span className="character-portrait" style={{backgroundImage:`url(/characters/${choice}.webp)`}}/><strong>{choice}</strong></button>)}</div>
+    <div className="character-choices">{characters.map(choice=><button key={choice} type="button" aria-label={`Choose ${choice}`} aria-pressed={avatar===choice} className={avatar===choice?'selected':''} onClick={()=>setAvatar(choice)}><span className="character-portrait" style={{backgroundImage:`url(/characters/${choice}.${choice==='tara'||choice==='kabir'?'png':'webp'})`}}/><strong>{choice}</strong></button>)}</div>
     <div className="color-label">Pick your colour</div>
     <div className="swatches">{colors.map(c=><button aria-label={`Choose ${c}`} className={c===color?'selected':''} style={{background:c}} onClick={()=>setColor(c)} key={c}/>)}</div>
     <fieldset className="play-mode">

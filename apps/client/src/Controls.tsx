@@ -4,10 +4,11 @@ import {socket} from './network';
 import {sounds} from './sound';
 import {serverNow} from './serverClock';
 
-export const localMotionInput={seq:0,dx:0,dz:0,sprint:false};
+export const localMotionInput={seq:Date.now(),dx:0,dz:0,sprint:false};
 
 export function Controls({room,id}:{room:PublicRoom;id:string}){
- const pressed=useRef(new Set<string>()),touch=useRef(new Set<string>()),seq=useRef(Date.now());
+ const pressed=useRef(new Set<string>()),touch=useRef(new Set<string>());
+ const refreshInput=useRef<()=>void>(()=>{});
  const me=room.players.find(p=>p.id===id);
  const frozen=serverNow()<(me?.freezeUntil??0);
  const allowed=!frozen&&canMove(room.phase,id,room.dennerId,room.runnerId,room.chaseStartsAt??0,serverNow());
@@ -17,35 +18,38 @@ export function Controls({room,id}:{room:PublicRoom;id:string}){
  const lastStep=useRef(0);
 
  useEffect(()=>{
-  const down=(e:KeyboardEvent)=>{if(['INPUT','SELECT','TEXTAREA'].includes((e.target as HTMLElement)?.tagName))return;pressed.current.add(e.key.toLowerCase());if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(e.key.toLowerCase()))e.preventDefault()};
-  const up=(e:KeyboardEvent)=>pressed.current.delete(e.key.toLowerCase());
+  const update=()=>{
+   const keys=new Set([...pressed.current,...touch.current]);
+   const dx=Number(keys.has('d')||keys.has('arrowright'))-Number(keys.has('a')||keys.has('arrowleft'));
+   const dz=Number(keys.has('s')||keys.has('arrowdown'))-Number(keys.has('w')||keys.has('arrowup'));
+   const moving=dx!==0||dz!==0;
+   const sprint=keys.has('shift')&&moving&&energy.current>8;
+   Object.assign(localMotionInput,{dx:allowed?dx:0,dz:allowed?dz:0,sprint:allowed&&sprint});
+   return {moving,sprint};
+  };
+  refreshInput.current=()=>{update()};
+  const down=(e:KeyboardEvent)=>{if(['INPUT','SELECT','TEXTAREA'].includes((e.target as HTMLElement)?.tagName))return;pressed.current.add(e.key.toLowerCase());update();if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(e.key.toLowerCase()))e.preventDefault()};
+  const up=(e:KeyboardEvent)=>{pressed.current.delete(e.key.toLowerCase());update()};
   const blur=()=>{pressed.current.clear();touch.current.clear();Object.assign(localMotionInput,{dx:0,dz:0,sprint:false})};
   window.addEventListener('keydown',down);window.addEventListener('keyup',up);window.addEventListener('blur',blur);
 
   const timer=setInterval(()=>{
-   const keys=new Set([...pressed.current,...touch.current]);
-   const rawDx=Number(keys.has('d')||keys.has('arrowright'))-Number(keys.has('a')||keys.has('arrowleft'));
-   const rawDz=Number(keys.has('s')||keys.has('arrowdown'))-Number(keys.has('w')||keys.has('arrowup'));
-   const moving=rawDx!==0||rawDz!==0;
-   const wantSprint=keys.has('shift')&&moving;
-
-   const actualSprint=wantSprint&&energy.current>8;
+   const {moving,sprint}=update();
 
    // Footstep SFX when moving
    const now=Date.now();
-   if(allowed&&moving&&now-lastStep.current>(actualSprint?240:370)){
+   if(allowed&&moving&&now-lastStep.current>(sprint?240:370)){
     sounds.playFootstep();
     lastStep.current=now;
    }
 
-   Object.assign(localMotionInput,{seq:++seq.current,dx:allowed?rawDx:0,dz:allowed?rawDz:0,sprint:actualSprint});
-   if(allowed)socket.emit('input',localMotionInput);
+   if(allowed)socket.emit('input',{...localMotionInput});
   },1000/30);
 
-  return()=>{Object.assign(localMotionInput,{dx:0,dz:0,sprint:false});clearInterval(timer);window.removeEventListener('keydown',down);window.removeEventListener('keyup',up);window.removeEventListener('blur',blur)}
+  return()=>{Object.assign(localMotionInput,{dx:0,dz:0,sprint:false});refreshInput.current=()=>{};clearInterval(timer);window.removeEventListener('keydown',down);window.removeEventListener('keyup',up);window.removeEventListener('blur',blur)}
  },[allowed]);
 
- const button=(key:string,label:string,style?:string)=><button className={`pad-key ${style||''}`} aria-label={label} disabled={!allowed} onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);touch.current.add(key)}} onPointerUp={()=>touch.current.delete(key)} onPointerCancel={()=>touch.current.delete(key)} onLostPointerCapture={()=>touch.current.delete(key)}>{label}</button>;
+ const button=(key:string,label:string,style?:string)=><button className={`pad-key ${style||''}`} aria-label={label} disabled={!allowed} onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);touch.current.add(key);refreshInput.current()}} onPointerUp={()=>{touch.current.delete(key);refreshInput.current()}} onPointerCancel={()=>{touch.current.delete(key);refreshInput.current()}} onLostPointerCapture={()=>{touch.current.delete(key);refreshInput.current()}}>{label}</button>;
 
  return <>
   <div className="controls desi-controls">
